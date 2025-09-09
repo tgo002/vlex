@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "echo 'Project ready for deployment'",
-    "start": "echo 'Production build ready'",
+    "build": "echo 'Static site ready'",
+    "start": "echo 'Ready for production'",
     "dev": "python -m http.server 3000",
     "serve": "python -m http.server 3000",
     "serve:bg": "python -m http.server 3000 &",

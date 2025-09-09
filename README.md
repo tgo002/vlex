@@ -30,8 +30,14 @@ Este projeto está configurado para deploy direto no Vercel usando a estrutura d
 - **Framework Preset:** Other
 - **Root Directory:** `./` (raiz)
 - **Build Command:** `npm run build`
-- **Output Directory:** `./` (deixar vazio)
+- **Output Directory:** (deixar vazio)
 - **Install Command:** `npm install`
+
+### ⚡ Otimizações Incluídas
+- **URLs limpas** sem `.html`
+- **Cache otimizado** para performance
+- **Headers de segurança** configurados
+- **Compressão automática** de assets
 
 ### 🌐 URLs de Acesso
 - **Página Principal**: `/`
