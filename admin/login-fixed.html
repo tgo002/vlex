@@ -254,7 +254,7 @@
     </div>
 
     <script type="module">
-        import { ensureAdminSessionForTest } from '../shared/supabase-client.js';
+        import { ensureAdminSessionForTest } from '/shared/supabase-client.js';
         // Sistema de login simplificado e robusto
         class SimpleLoginManager {
             constructor() {
@@ -364,7 +364,7 @@
                 this.log('Redirecionando para dashboard...');
                 
                 // Verificar se há URL de redirecionamento salva
-                const redirectUrl = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
+                const redirectUrl = sessionStorage.getItem('redirectAfterLogin') || '/admin/';
                 sessionStorage.removeItem('redirectAfterLogin');
                 
                 setTimeout(() => {
