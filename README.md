@@ -2,6 +2,35 @@
 
 Um sistema completo de administração e visualização de tours virtuais 360° para o mercado imobiliário, desenvolvido com **Supabase MCP** e **Playwright MCP** para testes automatizados.
 
+## 🚀 Deploy no Vercel
+
+Este projeto está configurado para deploy automático no Vercel. Os arquivos estão organizados na pasta `public/` para compatibilidade com hospedagem estática.
+
+### Estrutura do Projeto
+
+```
+public/
+├── index.html              # Página principal
+├── admin/                  # Sistema administrativo
+│   ├── index.html         # Dashboard admin
+│   ├── login.html         # Login administrativo
+│   ├── property-editor.html
+│   └── ...
+├── client/                 # Interface do cliente
+│   └── tour.html          # Visualizador de tours
+├── shared/                 # Recursos compartilhados
+│   ├── supabase-client.js
+│   ├── image-uploader.js
+│   └── ...
+└── tour-config.json       # Configurações dos tours
+```
+
+### URLs de Acesso
+- **Página Principal**: `/`
+- **Admin Login**: `/admin/login.html`
+- **Dashboard Admin**: `/admin/index.html`
+- **Visualizador de Tours**: `/client/tour.html`
+
 ## ✨ Características Principais
 
 ### 🎯 **Hotspots Espacialmente Ancorados**

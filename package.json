@@ -5,6 +5,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "build": "echo 'Static files ready in public directory'",
+    "start": "echo 'Production build ready'",
+    "dev": "python -m http.server 3000",
+    "serve": "python -m http.server 3000",
+    "serve:bg": "python -m http.server 3000 &",
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
@@ -14,13 +19,8 @@
     "test:properties": "playwright test tests/admin-properties.spec.js",
     "test:client": "playwright test tests/client-tour.spec.js",
     "test:install": "playwright install",
-    "serve": "python -m http.server 3000",
-    "serve:bg": "python -m http.server 3000 &",
-    "dev": "npm run serve",
-    "start": "npm run serve",
     "lint": "echo 'Linting JavaScript files...' && find . -name '*.js' -not -path './node_modules/*' -not -path './test-results/*' | head -10",
     "validate": "echo 'Validating HTML files...' && find . -name '*.html' -not -path './node_modules/*' | head -10",
-    "build": "echo 'Building project...' && npm run validate && npm run lint",
     "clean": "rm -rf test-results/ && rm -rf playwright-report/",
     "setup": "npm install && npm run test:install",
     "ci": "npm run clean && npm run test && npm run test:report"
@@ -48,12 +48,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/seu-usuario/sistema-tours-virtuais-360.git"
+    "url": "https://github.com/heroncosmo/vl.git"
   },
   "bugs": {
-    "url": "https://github.com/seu-usuario/sistema-tours-virtuais-360/issues"
+    "url": "https://github.com/heroncosmo/vl/issues"
   },
-  "homepage": "https://github.com/seu-usuario/sistema-tours-virtuais-360#readme",
+  "homepage": "https://github.com/heroncosmo/vl#readme",
   "browserslist": [
     "> 1%",
     "last 2 versions",

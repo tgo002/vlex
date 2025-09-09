@@ -78,3 +78,10 @@ uploads/
 !example-*.png
 !sample-*.jpg
 !sample-*.png
+
+# Original files (now in public directory)
+/admin/
+/client/
+/shared/
+/*.html
+/tour-config.json
