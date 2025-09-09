@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "echo 'Static files ready in public directory'",
+    "build": "echo 'Project ready for deployment'",
     "start": "echo 'Production build ready'",
     "dev": "python -m http.server 3000",
     "serve": "python -m http.server 3000",

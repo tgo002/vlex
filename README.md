@@ -4,6 +4,50 @@ Um sistema completo de administração e visualização de tours virtuais 360° 
 
 ## 🚀 Deploy no Vercel
 
+Este projeto está configurado para deploy direto no Vercel usando a estrutura da raiz.
+
+### 📁 Estrutura do Projeto
+
+```
+├── index.html              # Página principal
+├── admin/                  # Sistema administrativo
+│   ├── index.html         # Dashboard admin
+│   ├── login.html         # Login administrativo
+│   ├── property-editor.html
+│   └── ...
+├── client/                 # Interface do cliente
+│   └── tour.html          # Visualizador de tours
+├── shared/                 # Recursos compartilhados
+│   ├── supabase-client.js
+│   ├── image-uploader.js
+│   └── ...
+├── tests/                  # Testes automatizados
+├── vercel.json            # Configuração Vercel
+└── tour-config.json       # Configurações dos tours
+```
+
+### 🔧 Configuração Vercel
+- **Framework Preset:** Other
+- **Root Directory:** `./` (raiz)
+- **Build Command:** `npm run build`
+- **Output Directory:** `./` (deixar vazio)
+- **Install Command:** `npm install`
+
+### 🌐 URLs de Acesso
+- **Página Principal**: `/`
+- **Admin Login**: `/admin/login.html`
+- **Dashboard Admin**: `/admin/index.html`
+- **Visualizador de Tours**: `/client/tour.html`
+
+### ✏️ **Para Editar o Projeto:**
+**Edite sempre os arquivos na RAIZ do projeto:**
+- `index.html` (página principal)
+- `admin/` (sistema administrativo)
+- `client/` (interface do cliente)
+- `shared/` (recursos compartilhados)
+
+## 🚀 Deploy no Vercel
+
 Este projeto está configurado para deploy automático no Vercel. Os arquivos estão organizados na pasta `public/` para compatibilidade com hospedagem estática.
 
 ### Estrutura do Projeto
