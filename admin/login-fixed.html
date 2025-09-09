@@ -362,14 +362,19 @@
 
             redirectToDashboard() {
                 this.log('Redirecionando para dashboard...');
-                
+
                 // Verificar se há URL de redirecionamento salva
-                const redirectUrl = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
+                let redirectUrl = sessionStorage.getItem('redirectAfterLogin');
                 sessionStorage.removeItem('redirectAfterLogin');
-                
+
+                // Fallback absoluto para evitar caminho relativo errado quando acessa /admin/login-fixed/
+                if (!redirectUrl || redirectUrl.includes('login-fixed')) {
+                    redirectUrl = '/admin/index.html';
+                }
+
                 setTimeout(() => {
                     window.location.href = redirectUrl;
-                }, 500);
+                }, 300);
             }
 
             showAlert(message, type = 'error') {
