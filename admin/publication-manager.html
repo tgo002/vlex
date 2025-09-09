@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Publicações - Sistema de Tours Virtuais 360°</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 70px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #e9ecef;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .section-content {
+            padding: 30px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .property-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .property-card:hover {
+            border-color: #007bff;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .property-preview {
+            width: 100%;
+            height: 200px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .property-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .property-preview .placeholder {
+            font-size: 48px;
+            color: #6c757d;
+        }
+
+        .property-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .property-status.draft {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .property-status.published {
+            background: #28a745;
+            color: white;
+        }
+
+        .property-status.archived {
+            background: #6c757d;
+            color: white;
+        }
+
+        .property-info {
+            padding: 20px;
+        }
+
+        .property-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .property-description {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .property-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .property-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                height: auto;
+                padding: 15px 0;
+                gap: 15px;
+            }
+
+            .container {
+                padding: 20px 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .property-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="back-btn">
+                    ← Dashboard
+                </a>
+                <h1 class="page-title">Gerenciador de Publicações</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="alert" class="alert"></div>
+
+        <!-- Estatísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div class="stat-number" id="draftCount">0</div>
+                <div class="stat-label">Rascunhos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🌐</div>
+                <div class="stat-number" id="publishedCount">0</div>
+                <div class="stat-label">Publicados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-number" id="archivedCount">0</div>
+                <div class="stat-label">Arquivados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+        </div>
+
+        <!-- Propriedades -->
+        <div class="section">
+            <div class="section-header">
+                <h2>📋 Gerenciar Publicações</h2>
+            </div>
+            <div class="section-content">
+                <!-- Filtros -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="statusFilter" onchange="filterProperties()">
+                            <option value="">Todos</option>
+                            <option value="draft">Rascunhos</option>
+                            <option value="published">Publicados</option>
+                            <option value="archived">Arquivados</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Buscar</label>
+                        <input type="text" id="searchFilter" placeholder="Título da propriedade..." 
+                               onkeyup="filterProperties()">
+                    </div>
+                    <div class="filter-group">
+                        <label>Ordenar por</label>
+                        <select id="sortFilter" onchange="filterProperties()">
+                            <option value="created_at_desc">Mais recentes</option>
+                            <option value="created_at_asc">Mais antigos</option>
+                            <option value="title_asc">Título A-Z</option>
+                            <option value="title_desc">Título Z-A</option>
+                            <option value="published_at_desc">Publicação recente</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="loading" id="propertiesLoading">
+                    <div class="spinner"></div>
+                    <p>Carregando propriedades...</p>
+                </div>
+                
+                <div id="propertiesContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { authManager, propertyManager, sceneManager, utils } from '../shared/supabase-client.js';
+        import './auth-guard-fixed.js';
+
+        let currentUser = null;
+        let allProperties = [];
+        let filteredProperties = [];
+
+        // Verificar autenticação
+        authManager.onAuthChange((event, session) => {
+            const testLogin = localStorage.getItem('test_admin_logged_in') === 'true';
+            if (!session && testLogin) {
+                currentUser = { email: localStorage.getItem('test_admin_email') || 'admin@tours360.com' };
+                initPublicationManager();
+                return;
+            }
+            if (!session) {
+                window.location.href = 'login-fixed.html';
+                return;
+            }
+
+            currentUser = session.user;
+            initPublicationManager();
+        });
+
+        // Inicializar gerenciador de publicações
+        async function initPublicationManager() {
+            await loadProperties();
+            updateStats();
+            renderProperties();
+        }
+
+        // Carregar propriedades
+        async function loadProperties() {
+            const container = document.getElementById('propertiesContainer');
+            const loading = document.getElementById('propertiesLoading');
+            
+            loading.style.display = 'block';
+            
+            try {
+                const result = await propertyManager.getProperties();
+                
+                if (result.success) {
+                    allProperties = result.data || [];
+                    filteredProperties = [...allProperties];
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar propriedades:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <h3>Erro ao carregar propriedades</h3>
+                        <p>Ocorreu um erro ao carregar as propriedades. Tente novamente.</p>
+                        <button class="btn btn-primary" onclick="loadProperties()">
+                            🔄 Tentar Novamente
+                        </button>
+                    </div>
+                `;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Atualizar estatísticas
+        function updateStats() {
+            const draftCount = allProperties.filter(p => p.status === 'draft').length;
+            const publishedCount = allProperties.filter(p => p.status === 'published').length;
+            const archivedCount = allProperties.filter(p => p.status === 'archived').length;
+            const totalCount = allProperties.length;
+
+            document.getElementById('draftCount').textContent = draftCount;
+            document.getElementById('publishedCount').textContent = publishedCount;
+            document.getElementById('archivedCount').textContent = archivedCount;
+            document.getElementById('totalCount').textContent = totalCount;
+        }
+
+        // Filtrar propriedades
+        window.filterProperties = function() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+            const sortFilter = document.getElementById('sortFilter').value;
+
+            // Aplicar filtros
+            filteredProperties = allProperties.filter(property => {
+                const matchesStatus = !statusFilter || property.status === statusFilter;
+                const matchesSearch = !searchFilter || 
+                    property.title.toLowerCase().includes(searchFilter) ||
+                    (property.description && property.description.toLowerCase().includes(searchFilter));
+                
+                return matchesStatus && matchesSearch;
+            });
+
+            // Aplicar ordenação
+            filteredProperties.sort((a, b) => {
+                switch (sortFilter) {
+                    case 'created_at_asc':
+                        return new Date(a.created_at) - new Date(b.created_at);
+                    case 'created_at_desc':
+                        return new Date(b.created_at) - new Date(a.created_at);
+                    case 'title_asc':
+                        return a.title.localeCompare(b.title);
+                    case 'title_desc':
+                        return b.title.localeCompare(a.title);
+                    case 'published_at_desc':
+                        const aDate = a.published_at ? new Date(a.published_at) : new Date(0);
+                        const bDate = b.published_at ? new Date(b.published_at) : new Date(0);
+                        return bDate - aDate;
+                    default:
+                        return new Date(b.created_at) - new Date(a.created_at);
+                }
+            });
+
+            renderProperties();
+        };
+
+        // Renderizar propriedades
+        function renderProperties() {
+            const container = document.getElementById('propertiesContainer');
+            
+            if (filteredProperties.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>Nenhuma propriedade encontrada</h3>
+                        <p>Não há propriedades que correspondam aos filtros selecionados.</p>
+                        <a href="property-editor.html" class="btn btn-primary">
+                            ➕ Criar Nova Propriedade
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="properties-grid">
+                    ${filteredProperties.map(property => renderPropertyCard(property)).join('')}
+                </div>
+            `;
+        }
+
+        // Renderizar card de propriedade
+        function renderPropertyCard(property) {
+            const createdDate = new Date(property.created_at).toLocaleDateString('pt-BR');
+            const publishedDate = property.published_at ? 
+                new Date(property.published_at).toLocaleDateString('pt-BR') : null;
+
+            return `
+                <div class="property-card" data-property-id="${property.id}">
+                    <div class="property-preview">
+                        <div class="placeholder">🏠</div>
+                        <div class="property-status ${property.status}">${getStatusLabel(property.status)}</div>
+                    </div>
+                    <div class="property-info">
+                        <div class="property-title">${property.title}</div>
+                        <div class="property-description">${property.description || 'Sem descrição'}</div>
+                        <div class="property-meta">
+                            <span>📅 Criado: ${createdDate}</span>
+                            ${publishedDate ? `<span>🌐 Publicado: ${publishedDate}</span>` : ''}
+                        </div>
+                        <div class="property-actions">
+                            <a href="property-editor.html?id=${property.id}" class="btn btn-primary">
+                                ✏️ Editar
+                            </a>
+                            ${property.status === 'draft' ? `
+                                <button class="btn btn-success" onclick="publishProperty('${property.id}')">
+                                    🌐 Publicar
+                                </button>
+                            ` : ''}
+                            ${property.status === 'published' ? `
+                                <button class="btn btn-warning" onclick="unpublishProperty('${property.id}')">
+                                    📝 Despublicar
+                                </button>
+                                <button class="btn btn-primary" onclick="viewPublic('${property.id}')">
+                                    👁️ Ver Público
+                                </button>
+                            ` : ''}
+                            ${property.status !== 'archived' ? `
+                                <button class="btn btn-secondary" onclick="archiveProperty('${property.id}')">
+                                    📦 Arquivar
+                                </button>
+                            ` : `
+                                <button class="btn btn-success" onclick="unarchiveProperty('${property.id}')">
+                                    📤 Desarquivar
+                                </button>
+                            `}
+                            <button class="btn btn-danger" onclick="deleteProperty('${property.id}')">
+                                🗑️ Excluir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Obter label do status
+        function getStatusLabel(status) {
+            const labels = {
+                draft: 'Rascunho',
+                published: 'Publicado',
+                archived: 'Arquivado'
+            };
+            return labels[status] || status;
+        }
+
+        // Publicar propriedade
+        window.publishProperty = async function(propertyId) {
+            if (!confirm('Tem certeza que deseja publicar esta propriedade?')) {
+                return;
+            }
+
+            try {
+                const result = await propertyManager.updateProperty(propertyId, {
+                    status: 'published',
+                    published_at: new Date().toISOString()
+                });
+
+                if (result.success) {
+                    showAlert('Propriedade publicada com sucesso!', 'success');
+                    await loadProperties();
+                    updateStats();
+                    renderProperties();
+                } else {
+                    showAlert(result.error || 'Erro ao publicar propriedade.', 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao publicar:', error);
+                showAlert('Erro inesperado ao publicar propriedade.', 'error');
+            }
+        };
+
+        // Despublicar propriedade
+        window.unpublishProperty = async function(propertyId) {
+            if (!confirm('Tem certeza que deseja despublicar esta propriedade?')) {
+                return;
+            }
+
+            try {
+                const result = await propertyManager.updateProperty(propertyId, {
+                    status: 'draft'
+                });
+
+                if (result.success) {
+                    showAlert('Propriedade despublicada com sucesso!', 'success');
+                    await loadProperties();
+                    updateStats();
+                    renderProperties();
+                } else {
+                    showAlert(result.error || 'Erro ao despublicar propriedade.', 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao despublicar:', error);
+                showAlert('Erro inesperado ao despublicar propriedade.', 'error');
+            }
+        };
+
+        // Arquivar propriedade
+        window.archiveProperty = async function(propertyId) {
+            if (!confirm('Tem certeza que deseja arquivar esta propriedade?')) {
+                return;
+            }
+
+            try {
+                const result = await propertyManager.updateProperty(propertyId, {
+                    status: 'archived'
+                });
+
+                if (result.success) {
+                    showAlert('Propriedade arquivada com sucesso!', 'success');
+                    await loadProperties();
+                    updateStats();
+                    renderProperties();
+                } else {
+                    showAlert(result.error || 'Erro ao arquivar propriedade.', 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao arquivar:', error);
+                showAlert('Erro inesperado ao arquivar propriedade.', 'error');
+            }
+        };
+
+        // Desarquivar propriedade
+        window.unarchiveProperty = async function(propertyId) {
+            try {
+                const result = await propertyManager.updateProperty(propertyId, {
+                    status: 'draft'
+                });
+
+                if (result.success) {
+                    showAlert('Propriedade desarquivada com sucesso!', 'success');
+                    await loadProperties();
+                    updateStats();
+                    renderProperties();
+                } else {
+                    showAlert(result.error || 'Erro ao desarquivar propriedade.', 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao desarquivar:', error);
+                showAlert('Erro inesperado ao desarquivar propriedade.', 'error');
+            }
+        };
+
+        // Ver versão pública
+        window.viewPublic = function(propertyId) {
+            window.open(`../client/tour.html?id=${propertyId}`, '_blank');
+        };
+
+        // Excluir propriedade
+        window.deleteProperty = async function(propertyId) {
+            if (!confirm('ATENÇÃO: Esta ação não pode ser desfeita. Tem certeza que deseja excluir esta propriedade e todos os seus dados?')) {
+                return;
+            }
+
+            try {
+                const result = await propertyManager.deleteProperty(propertyId);
+
+                if (result.success) {
+                    showAlert('Propriedade excluída com sucesso!', 'success');
+                    await loadProperties();
+                    updateStats();
+                    renderProperties();
+                } else {
+                    showAlert(result.error || 'Erro ao excluir propriedade.', 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao excluir:', error);
+                showAlert('Erro inesperado ao excluir propriedade.', 'error');
+            }
+        };
+
+        // Função para mostrar alerta
+        function showAlert(message, type = 'error') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            
+            // Auto-hide após 5 segundos
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Expor função para recarregar
+        window.loadProperties = loadProperties;
+    </script>
+</body>
+</html>

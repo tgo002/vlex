@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview do Tour - Sistema de Tours Virtuais 360°</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: white;
+            overflow: hidden;
+        }
+
+        .preview-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #panorama {
+            width: 100%;
+            height: 100%;
+        }
+
+        .preview-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .overlay-btn {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .overlay-btn:hover {
+            background: rgba(0, 0, 0, 0.95);
+            transform: translateY(-2px);
+        }
+
+        .overlay-btn.primary {
+            background: rgba(0, 123, 255, 0.9);
+        }
+
+        .overlay-btn.primary:hover {
+            background: rgba(0, 123, 255, 1);
+        }
+
+        .scene-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 200px;
+        }
+
+        .scene-selector h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: white;
+        }
+
+        .scene-selector select {
+            width: 100%;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: white;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .tour-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+        }
+
+        .tour-info h2 {
+            margin-bottom: 10px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .tour-info p {
+            margin-bottom: 15px;
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        .tour-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .tour-stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hotspot-info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 300px;
+            display: none;
+            border: 2px solid #007bff;
+        }
+
+        .hotspot-info-panel h3 {
+            margin-bottom: 10px;
+            color: #007bff;
+            font-size: 18px;
+        }
+
+        .hotspot-info-panel p {
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .hotspot-info-panel .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .hotspot-info-panel .close-btn:hover {
+            color: white;
+        }
+
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #333;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #ccc;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .error-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .error-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .error-title {
+            font-size: 24px;
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            color: #ccc;
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Estilos personalizados para hotspots */
+        .pnlm-hotspot-base.hotspot-info {
+            background: #007bff !important;
+            border: 3px solid white !important;
+            border-radius: 50% !important;
+            width: 20px !important;
+            height: 20px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-info:hover {
+            background: #0056b3 !important;
+            transform: scale(1.3) !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-navigation {
+            background: #28a745 !important;
+            border: 3px solid white !important;
+            border-radius: 10% !important;
+            width: 24px !important;
+            height: 24px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-navigation:hover {
+            background: #218838 !important;
+            transform: scale(1.3) !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-highlight {
+            background: #ffc107 !important;
+            border: 3px solid white !important;
+            border-radius: 20% !important;
+            width: 22px !important;
+            height: 22px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-highlight:hover {
+            background: #e0a800 !important;
+            transform: scale(1.3) !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-highlight::after {
+            content: '⭐';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: white;
+            pointer-events: none;
+        }
+
+        /* Animações de pulse */
+        .pnlm-hotspot-base {
+            animation: hotspot-pulse 2s infinite;
+        }
+
+        @keyframes hotspot-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 123, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
+        }
+
+        .pnlm-hotspot-base.hotspot-navigation {
+            animation: hotspot-pulse-green 2s infinite;
+        }
+
+        @keyframes hotspot-pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+
+        .pnlm-hotspot-base.hotspot-highlight {
+            animation: hotspot-pulse-yellow 2s infinite;
+        }
+
+        @keyframes hotspot-pulse-yellow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .preview-overlay {
+                flex-direction: column;
+                top: 10px;
+                left: 10px;
+            }
+
+            .scene-selector {
+                top: 10px;
+                right: 10px;
+                min-width: 150px;
+                padding: 10px;
+            }
+
+            .tour-info {
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                max-width: none;
+                padding: 15px;
+            }
+
+            .hotspot-info-panel {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+
+            .tour-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <!-- Tela de carregamento -->
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">
+                <h2>Carregando Tour Virtual...</h2>
+                <p>Preparando experiência 360°</p>
+            </div>
+        </div>
+
+        <!-- Tela de erro -->
+        <div class="error-screen" id="errorScreen">
+            <div class="error-icon">❌</div>
+            <h2 class="error-title">Erro ao Carregar Tour</h2>
+            <p class="error-message" id="errorMessage">
+                Ocorreu um erro inesperado ao carregar o tour virtual.
+            </p>
+            <div class="error-actions">
+                <button class="overlay-btn" onclick="retryLoad()">
+                    🔄 Tentar Novamente
+                </button>
+                <button class="overlay-btn" onclick="goBack()">
+                    ← Voltar ao Editor
+                </button>
+            </div>
+        </div>
+
+        <!-- Visualizador 360° -->
+        <div id="panorama"></div>
+
+        <!-- Controles overlay -->
+        <div class="preview-overlay">
+            <button class="overlay-btn" onclick="goBack()">
+                ← Voltar ao Editor
+            </button>
+            <button class="overlay-btn primary" onclick="openClientView()">
+                🌐 Ver Versão Cliente
+            </button>
+            <button class="overlay-btn" onclick="toggleFullscreen()">
+                🔍 Tela Cheia
+            </button>
+        </div>
+
+        <!-- Seletor de cenas -->
+        <div class="scene-selector">
+            <h3>📸 Cenas</h3>
+            <select id="sceneSelect" onchange="changeScene()">
+                <option value="">Carregando...</option>
+            </select>
+        </div>
+
+        <!-- Informações do tour -->
+        <div class="tour-info" id="tourInfo">
+            <h2 id="propertyTitle">Carregando...</h2>
+            <p id="propertyDescription">Preparando informações...</p>
+            <div class="tour-stats">
+                <span>📸 <span id="sceneCount">0</span> cenas</span>
+                <span>📍 <span id="hotspotCount">0</span> hotspots</span>
+                <span>👁️ Preview</span>
+            </div>
+        </div>
+
+        <!-- Painel de informações do hotspot -->
+        <div class="hotspot-info-panel" id="hotspotInfoPanel">
+            <button class="close-btn" onclick="closeHotspotInfo()">×</button>
+            <h3 id="hotspotTitle">Título do Hotspot</h3>
+            <p id="hotspotDescription">Descrição do hotspot...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { authManager, propertyManager, sceneManager, hotspotManager, utils } from '../shared/supabase-client.js';
+        import './auth-guard-fixed.js';
+
+        let currentUser = null;
+        let propertyId = null;
+        let currentProperty = null;
+        let scenes = [];
+        let currentScene = null;
+        let allHotspots = [];
+        let viewer = null;
+
+        // Verificar autenticação
+        authManager.onAuthChange((event, session) => {
+            const testLogin = localStorage.getItem('test_admin_logged_in') === 'true';
+            if (!session && testLogin) {
+                currentUser = { email: localStorage.getItem('test_admin_email') || 'admin@tours360.com' };
+                initPreview();
+                return;
+            }
+            if (!session) {
+                window.location.href = 'login-fixed.html';
+                return;
+            }
+
+            currentUser = session.user;
+            initPreview();
+        });
+
+        // Inicializar preview
+        async function initPreview() {
+            try {
+                // Obter ID da propriedade da URL
+                const urlParams = new URLSearchParams(window.location.search);
+                propertyId = urlParams.get('id') || urlParams.get('propertyId');
+                
+                if (!propertyId) {
+                    throw new Error('ID da propriedade não encontrado na URL');
+                }
+
+                // Carregar dados
+                await loadProperty();
+                await loadScenes();
+                await loadAllHotspots();
+                
+                // Inicializar viewer
+                initViewer();
+                
+                // Ocultar tela de carregamento
+                document.getElementById('loadingScreen').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Erro ao inicializar preview:', error);
+                showError(error.message);
+            }
+        }
+
+        // Carregar propriedade
+        async function loadProperty() {
+            const result = await propertyManager.getProperty(propertyId);
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Erro ao carregar propriedade');
+            }
+            
+            currentProperty = result.data;
+            
+            // Atualizar informações na UI
+            document.getElementById('propertyTitle').textContent = currentProperty.title;
+            document.getElementById('propertyDescription').textContent = 
+                currentProperty.description || 'Explore este tour virtual 360°';
+        }
+
+        // Carregar cenas
+        async function loadScenes() {
+            const result = await sceneManager.getScenes(propertyId);
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Erro ao carregar cenas');
+            }
+            
+            scenes = result.data || [];
+            
+            if (scenes.length === 0) {
+                throw new Error('Nenhuma cena encontrada para esta propriedade');
+            }
+            
+            // Atualizar contador
+            document.getElementById('sceneCount').textContent = scenes.length;
+            
+            // Popular seletor
+            populateSceneSelector();
+        }
+
+        // Carregar todos os hotspots
+        async function loadAllHotspots() {
+            allHotspots = [];
+            
+            for (const scene of scenes) {
+                const result = await hotspotManager.getHotspots(scene.id);
+                if (result.success && result.data) {
+                    allHotspots = allHotspots.concat(result.data);
+                }
+            }
+            
+            // Atualizar contador
+            document.getElementById('hotspotCount').textContent = allHotspots.length;
+        }
+
+        // Popular seletor de cenas
+        function populateSceneSelector() {
+            const sceneSelect = document.getElementById('sceneSelect');
+            
+            sceneSelect.innerHTML = scenes.map(scene => 
+                `<option value="${scene.id}">${scene.title}</option>`
+            ).join('');
+            
+            // Selecionar cena padrão ou primeira
+            const defaultScene = scenes.find(s => s.is_default) || scenes[0];
+            sceneSelect.value = defaultScene.id;
+            currentScene = defaultScene;
+        }
+
+        // Inicializar viewer
+        function initViewer() {
+            if (!currentScene) return;
+
+            const config = {
+                type: 'equirectangular',
+                panorama: currentScene.image_url,
+                autoLoad: true,
+                pitch: currentScene.initial_pitch || 0,
+                yaw: currentScene.initial_yaw || 0,
+                hfov: currentScene.initial_hfov || 110,
+                showControls: true,
+                hotSpots: []
+            };
+
+            viewer = pannellum.viewer('panorama', config);
+            
+            viewer.on('load', () => {
+                console.log('Cena carregada:', currentScene.title);
+                updateHotspotsInViewer();
+            });
+        }
+
+        // Mudar cena
+        window.changeScene = function() {
+            const sceneId = document.getElementById('sceneSelect').value;
+            if (!sceneId) return;
+
+            currentScene = scenes.find(s => s.id === sceneId);
+            if (!currentScene) return;
+
+            // Fechar painel de hotspot se estiver aberto
+            closeHotspotInfo();
+
+            // Carregar nova cena
+            viewer.loadScene(currentScene.image_url, 
+                currentScene.initial_pitch || 0,
+                currentScene.initial_yaw || 0,
+                currentScene.initial_hfov || 110
+            );
+        };
+
+        // Atualizar hotspots no viewer
+        function updateHotspotsInViewer() {
+            if (!viewer || !currentScene) return;
+
+            // Remover hotspots existentes
+            viewer.removeAllHotSpots();
+
+            // Filtrar hotspots da cena atual
+            const sceneHotspots = allHotspots.filter(h => h.scene_id === currentScene.id);
+
+            // Adicionar hotspots
+            sceneHotspots.forEach(hotspot => {
+                const hotspotConfig = {
+                    id: hotspot.id,
+                    pitch: hotspot.pitch,
+                    yaw: hotspot.yaw,
+                    type: 'info',
+                    text: hotspot.title,
+                    cssClass: `hotspot-${hotspot.type}`,
+                    clickHandlerFunc: () => handleHotspotClick(hotspot),
+                    createTooltipFunc: (hotSpotDiv, args) => {
+                        hotSpotDiv.style.backgroundColor = hotspot.color || '#007bff';
+                        return hotspot.title;
+                    }
+                };
+
+                viewer.addHotSpot(hotspotConfig);
+            });
+        }
+
+        // Handle clique em hotspot
+        function handleHotspotClick(hotspot) {
+            if (hotspot.type === 'navigation' && hotspot.target_scene_id) {
+                // Navegar para outra cena
+                const targetScene = scenes.find(s => s.id === hotspot.target_scene_id);
+                if (targetScene) {
+                    currentScene = targetScene;
+                    document.getElementById('sceneSelect').value = targetScene.id;
+                    
+                    viewer.loadScene(targetScene.image_url,
+                        targetScene.initial_pitch || 0,
+                        targetScene.initial_yaw || 0,
+                        targetScene.initial_hfov || 110
+                    );
+                }
+            } else {
+                // Mostrar informações do hotspot
+                showHotspotInfo(hotspot);
+            }
+        }
+
+        // Mostrar informações do hotspot
+        function showHotspotInfo(hotspot) {
+            document.getElementById('hotspotTitle').textContent = hotspot.title;
+            document.getElementById('hotspotDescription').textContent = 
+                hotspot.description || 'Sem descrição disponível';
+            
+            document.getElementById('hotspotInfoPanel').style.display = 'block';
+        }
+
+        // Fechar informações do hotspot
+        window.closeHotspotInfo = function() {
+            document.getElementById('hotspotInfoPanel').style.display = 'none';
+        };
+
+        // Voltar ao editor
+        window.goBack = function() {
+            window.location.href = `property-editor.html?id=${propertyId}`;
+        };
+
+        // Abrir versão cliente
+        window.openClientView = function() {
+            window.open(`../client/tour.html?id=${propertyId}`, '_blank');
+        };
+
+        // Toggle fullscreen
+        window.toggleFullscreen = function() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        };
+
+        // Tentar novamente
+        window.retryLoad = function() {
+            document.getElementById('errorScreen').style.display = 'none';
+            document.getElementById('loadingScreen').style.display = 'flex';
+            initPreview();
+        };
+
+        // Mostrar erro
+        function showError(message) {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorScreen').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

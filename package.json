@@ -1,0 +1,133 @@
+{
+  "name": "sistema-tours-virtuais-360",
+  "version": "1.0.0",
+  "description": "Sistema completo de administração e visualização de tours virtuais 360° para imóveis",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "test:auth": "playwright test tests/admin-auth.spec.js",
+    "test:properties": "playwright test tests/admin-properties.spec.js",
+    "test:client": "playwright test tests/client-tour.spec.js",
+    "test:install": "playwright install",
+    "serve": "python -m http.server 3000",
+    "serve:bg": "python -m http.server 3000 &",
+    "dev": "npm run serve",
+    "start": "npm run serve",
+    "lint": "echo 'Linting JavaScript files...' && find . -name '*.js' -not -path './node_modules/*' -not -path './test-results/*' | head -10",
+    "validate": "echo 'Validating HTML files...' && find . -name '*.html' -not -path './node_modules/*' | head -10",
+    "build": "echo 'Building project...' && npm run validate && npm run lint",
+    "clean": "rm -rf test-results/ && rm -rf playwright-report/",
+    "setup": "npm install && npm run test:install",
+    "ci": "npm run clean && npm run test && npm run test:report"
+  },
+  "keywords": [
+    "virtual-tour",
+    "360",
+    "real-estate",
+    "panorama",
+    "pannellum",
+    "supabase",
+    "playwright",
+    "testing",
+    "admin-system",
+    "property-management"
+  ],
+  "author": "Sistema de Tours Virtuais 360°",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seu-usuario/sistema-tours-virtuais-360.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seu-usuario/sistema-tours-virtuais-360/issues"
+  },
+  "homepage": "https://github.com/seu-usuario/sistema-tours-virtuais-360#readme",
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ],
+  "playwright": {
+    "testDir": "./tests",
+    "timeout": 30000,
+    "expect": {
+      "timeout": 5000
+    },
+    "fullyParallel": true,
+    "forbidOnly": true,
+    "retries": 2,
+    "workers": 1,
+    "reporter": [
+      [
+        "html"
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ]
+    ],
+    "use": {
+      "baseURL": "http://localhost:3000",
+      "trace": "on-first-retry",
+      "screenshot": "only-on-failure",
+      "video": "retain-on-failure"
+    },
+    "projects": [
+      {
+        "name": "chromium",
+        "use": {
+          "channel": "chrome"
+        }
+      },
+      {
+        "name": "firefox",
+        "use": {
+          "browserName": "firefox"
+        }
+      },
+      {
+        "name": "webkit",
+        "use": {
+          "browserName": "webkit"
+        }
+      }
+    ],
+    "webServer": {
+      "command": "python -m http.server 3000",
+      "port": 3000,
+      "reuseExistingServer": true
+    }
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "collectCoverageFrom": [
+      "shared/**/*.js",
+      "admin/**/*.js",
+      "client/**/*.js",
+      "!**/node_modules/**",
+      "!**/test-results/**"
+    ]
+  }
+}

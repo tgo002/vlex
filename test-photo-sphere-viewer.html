@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Photo Sphere Viewer - Tour Virtual 360°</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #000;
+        }
+        
+        #viewer {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .controls button {
+            margin: 5px;
+            padding: 8px 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .controls button:hover {
+            background: #1e7e34;
+        }
+        
+        .info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            max-width: 300px;
+        }
+        
+        .marker-tooltip {
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            padding: 12px;
+            border-radius: 6px;
+            max-width: 250px;
+            font-size: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h3>Teste Photo Sphere Viewer - Markers Fixos</h3>
+        <button onclick="switchPanorama('pano1')">Panorama 1</button>
+        <button onclick="switchPanorama('pano2')">Panorama 2</button>
+        <button onclick="addTestMarker()">Adicionar Marker Teste</button>
+        <button onclick="testNavigation()">Teste Navegação</button>
+        <button onclick="toggleMarkers()">Toggle Markers</button>
+    </div>
+    
+    <div class="info">
+        <h4>Teste de Ancoragem de Markers</h4>
+        <p>Os markers devem permanecer fixos nas coordenadas esféricas específicas durante toda a navegação.</p>
+        <p><strong>Instruções:</strong></p>
+        <ul>
+            <li>Navegue pela cena (arrastar, zoom)</li>
+            <li>Observe se os markers permanecem alinhados</li>
+            <li>Clique nos markers para interagir</li>
+        </ul>
+    </div>
+
+    <div id="viewer"></div>
+
+    <!-- Photo Sphere Viewer CDN -->
+    <script type="module">
+        import { Viewer } from 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5/index.module.min.js';
+        import { MarkersPlugin } from 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5/index.module.min.js';
+        import { VirtualTourPlugin } from 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/virtual-tour-plugin@5/index.module.min.js';
+
+        let viewer;
+        let markersPlugin;
+        let virtualTourPlugin;
+        let currentPanorama = 'pano1';
+        
+        // Configuração dos panoramas
+        const panoramas = {
+            pano1: {
+                src: './file-1755566234737-636002416.jpg',
+                name: 'Ambiente 1',
+                markers: [
+                    {
+                        id: 'marker1',
+                        position: { yaw: '132.9deg', pitch: '-2.1deg' },
+                        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIGZpbGw9IiNGRjAwMDAiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjE2IiB5PSIyMSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjRkZGRkZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4xPC90ZXh0Pgo8L3N2Zz4K',
+                        size: { width: 32, height: 32 },
+                        anchor: 'bottom center',
+                        tooltip: {
+                            content: '<div class="marker-tooltip"><strong>Sala de Estar</strong><br>Ampla sala com vista panorâmica<br><em>Marker fixo em coordenadas esféricas</em></div>',
+                            position: 'top center'
+                        },
+                        data: {
+                            type: 'info',
+                            title: 'Sala de Estar'
+                        }
+                    },
+                    {
+                        id: 'marker2',
+                        position: { yaw: '1.5deg', pitch: '14.1deg' },
+                        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIGZpbGw9IiMwMDdCRkYiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjE2IiB5PSIyMSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjRkZGRkZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5pPC90ZXh0Pgo8L3N2Zz4K',
+                        size: { width: 32, height: 32 },
+                        anchor: 'bottom center',
+                        tooltip: {
+                            content: '<div class="marker-tooltip"><strong>Detalhes Arquitetônicos</strong><br>Características únicas do projeto<br><em>Posição fixa no espaço 3D</em></div>',
+                            position: 'top center'
+                        },
+                        data: {
+                            type: 'info',
+                            title: 'Arquitetura'
+                        }
+                    },
+                    {
+                        id: 'marker3',
+                        position: { yaw: '222.6deg', pitch: '-0.9deg' },
+                        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIGZpbGw9IiMyOEE3NDUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjE2IiB5PSIyMSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjRkZGRkZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7ihpI8L3RleHQ+Cjwvc3ZnPgo=',
+                        size: { width: 32, height: 32 },
+                        anchor: 'bottom center',
+                        tooltip: {
+                            content: '<div class="marker-tooltip"><strong>Ir para Ambiente 2</strong><br>Clique para navegar<br><em>Transição entre cenas</em></div>',
+                            position: 'top center'
+                        },
+                        data: {
+                            type: 'navigation',
+                            target: 'pano2'
+                        }
+                    }
+                ]
+            },
+            pano2: {
+                src: './file-1755614332574-909944521.JPG',
+                name: 'Ambiente 2',
+                markers: [
+                    {
+                        id: 'marker4',
+                        position: { yaw: '-93.6deg', pitch: '2.1deg' },
+                        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIGZpbGw9IiNGRkM5MDAiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjE2IiB5PSIyMSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMDAwMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4yPC90ZXh0Pgo8L3N2Zz4K',
+                        size: { width: 32, height: 32 },
+                        anchor: 'bottom center',
+                        tooltip: {
+                            content: '<div class="marker-tooltip"><strong>Área Especial</strong><br>Características únicas deste ambiente<br><em>Marker ancorado em coordenadas 3D</em></div>',
+                            position: 'top center'
+                        },
+                        data: {
+                            type: 'info',
+                            title: 'Área Especial'
+                        }
+                    },
+                    {
+                        id: 'marker5',
+                        position: { yaw: '222.6deg', pitch: '-0.9deg' },
+                        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIGZpbGw9IiMyOEE3NDUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjE2IiB5PSIyMSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjRkZGRkZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7ihpA8L3RleHQ+Cjwvc3ZnPgo=',
+                        size: { width: 32, height: 32 },
+                        anchor: 'bottom center',
+                        tooltip: {
+                            content: '<div class="marker-tooltip"><strong>Voltar para Ambiente 1</strong><br>Clique para navegar<br><em>Retorno à cena anterior</em></div>',
+                            position: 'top center'
+                        },
+                        data: {
+                            type: 'navigation',
+                            target: 'pano1'
+                        }
+                    }
+                ]
+            }
+        };
+
+        // Inicializar o viewer
+        function initViewer() {
+            viewer = new Viewer({
+                container: 'viewer',
+                panorama: panoramas.pano1.src,
+                caption: panoramas.pano1.name,
+                loadingImg: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtZGFzaGFycmF5PSIxMCIvPgo8L3N2Zz4K',
+                plugins: [
+                    [MarkersPlugin, {
+                        markers: panoramas.pano1.markers
+                    }]
+                ]
+            });
+
+            markersPlugin = viewer.getPlugin(MarkersPlugin);
+
+            // Event listeners
+            viewer.addEventListener('ready', () => {
+                console.log('Photo Sphere Viewer carregado');
+                logMarkerPositions();
+            });
+
+            viewer.addEventListener('position-updated', () => {
+                console.log('Posição atualizada - Verificando markers');
+                setTimeout(logMarkerPositions, 100);
+            });
+
+            markersPlugin.addEventListener('select-marker', (e) => {
+                const marker = e.marker;
+                console.log('Marker selecionado:', marker.id, marker.data);
+                
+                if (marker.data.type === 'navigation') {
+                    switchPanorama(marker.data.target);
+                } else {
+                    showMarkerInfo(marker.data.title, marker.tooltip.content);
+                }
+            });
+        }
+
+        // Função para registrar posições dos markers
+        function logMarkerPositions() {
+            const position = viewer.getPosition();
+            const markers = markersPlugin.getMarkers();
+            
+            console.log(`=== Posições dos Markers - ${panoramas[currentPanorama].name} ===`);
+            console.log(`Posição da câmera: Yaw=${(position.yaw * 180 / Math.PI).toFixed(2)}°, Pitch=${(position.pitch * 180 / Math.PI).toFixed(2)}°`);
+            
+            markers.forEach((marker) => {
+                const pos = marker.config.position;
+                console.log(`Marker ${marker.id}: Yaw=${pos.yaw}, Pitch=${pos.pitch}`);
+            });
+        }
+
+        // Função para mostrar informações do marker
+        function showMarkerInfo(title, content) {
+            // Remove HTML tags for alert
+            const cleanContent = content.replace(/<[^>]*>/g, '');
+            alert(`${title}\n\n${cleanContent}\n\nObserve que este marker permanece fixo na posição correta da imagem 360°!`);
+        }
+
+        // Função para trocar panorama
+        window.switchPanorama = function(panoId) {
+            if (panoramas[panoId]) {
+                currentPanorama = panoId;
+                const pano = panoramas[panoId];
+                
+                viewer.setPanorama(pano.src, {
+                    caption: pano.name,
+                    transition: 1000
+                }).then(() => {
+                    markersPlugin.clearMarkers();
+                    markersPlugin.setMarkers(pano.markers);
+                    console.log(`Panorama alterado para: ${pano.name}`);
+                    logMarkerPositions();
+                });
+            }
+        };
+
+        // Função para adicionar marker de teste
+        window.addTestMarker = function() {
+            const position = viewer.getPosition();
+            const testId = 'test_' + Date.now();
+            
+            const testMarker = {
+                id: testId,
+                position: { 
+                    yaw: position.yaw + 'rad', 
+                    pitch: position.pitch + 'rad' 
+                },
+                image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIGZpbGw9IiNGRjAwRkYiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjE2IiB5PSIyMSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjRkZGRkZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5UPC90ZXh0Pgo8L3N2Zz4K',
+                size: { width: 32, height: 32 },
+                anchor: 'bottom center',
+                tooltip: {
+                    content: `<div class="marker-tooltip"><strong>Marker Teste</strong><br>Adicionado dinamicamente<br>Yaw: ${(position.yaw * 180 / Math.PI).toFixed(2)}°<br>Pitch: ${(position.pitch * 180 / Math.PI).toFixed(2)}°</div>`,
+                    position: 'top center'
+                },
+                data: {
+                    type: 'test',
+                    title: 'Teste Dinâmico'
+                }
+            };
+            
+            markersPlugin.addMarker(testMarker);
+            console.log('Marker teste adicionado:', testMarker);
+        };
+
+        // Função para testar navegação
+        window.testNavigation = function() {
+            console.log('=== Iniciando Teste de Navegação Automática ===');
+            
+            const initialPosition = viewer.getPosition();
+            
+            const testPositions = [
+                { yaw: 0, pitch: 0 },
+                { yaw: Math.PI/2, pitch: 0.2 },
+                { yaw: Math.PI, pitch: -0.2 },
+                { yaw: 3*Math.PI/2, pitch: 0.1 },
+                { yaw: initialPosition.yaw, pitch: initialPosition.pitch }
+            ];
+            
+            let currentTest = 0;
+            
+            function runNextTest() {
+                if (currentTest < testPositions.length) {
+                    const pos = testPositions[currentTest];
+                    console.log(`Teste ${currentTest + 1}: Movendo para Yaw=${(pos.yaw * 180 / Math.PI).toFixed(2)}°, Pitch=${(pos.pitch * 180 / Math.PI).toFixed(2)}°`);
+                    
+                    viewer.animate({
+                        yaw: pos.yaw,
+                        pitch: pos.pitch,
+                        speed: '2rpm'
+                    }).then(() => {
+                        logMarkerPositions();
+                        currentTest++;
+                        setTimeout(runNextTest, 1000);
+                    });
+                }
+            }
+            
+            runNextTest();
+        };
+
+        // Função para toggle markers
+        window.toggleMarkers = function() {
+            const markers = markersPlugin.getMarkers();
+            if (markers.length > 0) {
+                markersPlugin.clearMarkers();
+                console.log('Markers ocultados');
+            } else {
+                markersPlugin.setMarkers(panoramas[currentPanorama].markers);
+                console.log('Markers exibidos');
+            }
+        };
+
+        // Inicializar quando a página carregar
+        window.addEventListener('load', initViewer);
+    </script>
+</body>
+</html>

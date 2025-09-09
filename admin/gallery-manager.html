@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Galeria - Sistema de Tours Virtuais 360°</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            height: 70px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #e9ecef;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .property-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .property-selector select {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .gallery-header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .property-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .property-details h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .property-details p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .gallery-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 2px dashed #007bff;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #0056b3;
+            background: #f0f8ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #28a745;
+            background: #f8fff8;
+        }
+
+        .upload-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #007bff;
+        }
+
+        .upload-text h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .upload-text p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .upload-formats {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .gallery-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .gallery-item.is-main {
+            border: 3px solid #28a745;
+        }
+
+        .gallery-item.is-main::before {
+            content: '⭐ Principal';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .gallery-item-content {
+            padding: 15px;
+        }
+
+        .gallery-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .gallery-item-type {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .gallery-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                height: auto;
+                padding: 15px 0;
+                gap: 15px;
+            }
+
+            .property-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .gallery-stats {
+                flex-wrap: wrap;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="back-btn">
+                    ← Voltar ao Dashboard
+                </a>
+                <h1 class="page-title">Gerenciador de Galeria</h1>
+            </div>
+            <div class="property-selector">
+                <label for="propertySelect">Propriedade:</label>
+                <select id="propertySelect">
+                    <option value="">Selecione uma propriedade...</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Carregando propriedades...</p>
+        </div>
+
+        <!-- Alerts -->
+        <div id="alertContainer"></div>
+
+        <!-- Property not selected -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-state-icon">🏠</div>
+            <h3>Selecione uma propriedade</h3>
+            <p>Escolha uma propriedade no menu acima para gerenciar sua galeria de imagens.</p>
+        </div>
+
+        <!-- Gallery Content -->
+        <div id="galleryContent" style="display: none;">
+            <!-- Gallery Header -->
+            <div class="gallery-header">
+                <div class="property-info">
+                    <div class="property-details">
+                        <h2 id="propertyTitle">Nome da Propriedade</h2>
+                        <p id="propertyLocation">Localização</p>
+                    </div>
+                    <div class="gallery-stats">
+                        <div class="stat-item">
+                            <span>📷</span>
+                            <span id="totalImages">0 imagens</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>⭐</span>
+                            <span id="mainImageStatus">Sem imagem principal</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>📊</span>
+                            <span id="galleryStatus">Status</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <h3 style="margin-bottom: 20px;">📤 Adicionar Novas Imagens</h3>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">
+                            <h3>Arraste e solte imagens aqui</h3>
+                            <p>ou clique para selecionar arquivos</p>
+                            <p class="upload-formats">Formatos aceitos: JPG, PNG, WebP (máx. 10MB cada)</p>
+                        </div>
+                        <input type="file" id="imageInput" multiple accept="image/jpeg,image/jpg,image/png,image/webp" style="display: none;">
+                        <button class="btn btn-primary" onclick="document.getElementById('imageInput').click()">
+                            📁 Selecionar Imagens
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Imagens serão carregadas aqui -->
+            </div>
+
+            <!-- Empty Gallery -->
+            <div class="empty-state" id="emptyGallery" style="display: none;">
+                <div class="empty-state-icon">🖼️</div>
+                <h3>Galeria vazia</h3>
+                <p>Esta propriedade ainda não possui imagens. Adicione algumas imagens usando a área de upload acima.</p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { authManager, propertyManager, utils } from '../shared/supabase-client.js';
+        import './auth-guard-fixed.js';
+
+        let currentUser = null;
+        let currentProperty = null;
+        let galleryImages = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                currentUser = await authManager.getCurrentUser();
+                const testLogin = localStorage.getItem('test_admin_logged_in') === 'true';
+                if (!currentUser && testLogin) {
+                    currentUser = { email: localStorage.getItem('test_admin_email') || 'admin@tours360.com' };
+                }
+                if (!currentUser) {
+                    window.location.href = 'login-fixed.html';
+                    return;
+                }
+
+                await loadProperties();
+                setupEventListeners();
+            } catch (error) {
+                console.error('Erro na inicialização:', error);
+                showAlert('Erro ao carregar página.', 'error');
+            }
+        });
+
+        // Load properties for selector
+        async function loadProperties() {
+            try {
+                const { data: properties, error } = await utils.supabase
+                    .from('properties')
+                    .select('id, title, city, state')
+                    .order('title');
+
+                if (error) throw error;
+
+                const propertySelect = document.getElementById('propertySelect');
+                propertySelect.innerHTML = '<option value="">Selecione uma propriedade...</option>';
+
+                properties.forEach(property => {
+                    const option = document.createElement('option');
+                    option.value = property.id;
+                    option.textContent = `${property.title} - ${property.city}, ${property.state}`;
+                    propertySelect.appendChild(option);
+                });
+
+                hideLoading();
+                showEmptyState();
+            } catch (error) {
+                console.error('Erro ao carregar propriedades:', error);
+                showAlert('Erro ao carregar propriedades.', 'error');
+                hideLoading();
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            const propertySelect = document.getElementById('propertySelect');
+            const uploadArea = document.getElementById('uploadArea');
+            const imageInput = document.getElementById('imageInput');
+
+            // Property selection
+            propertySelect.addEventListener('change', (e) => {
+                if (e.target.value) {
+                    loadPropertyGallery(e.target.value);
+                } else {
+                    showEmptyState();
+                }
+            });
+
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = Array.from(e.dataTransfer.files);
+                handleImageFiles(files);
+            });
+
+            // Click upload
+            uploadArea.addEventListener('click', () => {
+                imageInput.click();
+            });
+
+            // File input change
+            imageInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                handleImageFiles(files);
+            });
+        }
+
+        // Load property gallery
+        async function loadPropertyGallery(propertyId) {
+            try {
+                showLoading();
+
+                // Load property details
+                const { data: property, error: propertyError } = await utils.supabase
+                    .from('properties')
+                    .select('*')
+                    .eq('id', propertyId)
+                    .single();
+
+                if (propertyError) throw propertyError;
+
+                currentProperty = property;
+
+                // Load gallery images
+                const { data: images, error: imagesError } = await utils.supabase
+                    .from('property_images')
+                    .select('*')
+                    .eq('property_id', propertyId)
+                    .order('order_index');
+
+                if (imagesError) throw imagesError;
+
+                galleryImages = images || [];
+
+                displayPropertyGallery();
+                hideLoading();
+            } catch (error) {
+                console.error('Erro ao carregar galeria:', error);
+                showAlert('Erro ao carregar galeria da propriedade.', 'error');
+                hideLoading();
+            }
+        }
+
+        // Display property gallery
+        function displayPropertyGallery() {
+            // Update property info
+            document.getElementById('propertyTitle').textContent = currentProperty.title;
+            document.getElementById('propertyLocation').textContent = 
+                `${currentProperty.city}, ${currentProperty.state}`;
+
+            // Update stats
+            const totalImages = galleryImages.length;
+            const mainImage = galleryImages.find(img => img.is_main);
+            
+            document.getElementById('totalImages').textContent = `${totalImages} imagem${totalImages !== 1 ? 's' : ''}`;
+            document.getElementById('mainImageStatus').textContent = mainImage ? 'Imagem principal definida' : 'Sem imagem principal';
+            document.getElementById('galleryStatus').textContent = totalImages > 0 ? 'Galeria ativa' : 'Galeria vazia';
+
+            // Display gallery
+            displayGalleryGrid();
+
+            // Show gallery content
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('galleryContent').style.display = 'block';
+        }
+
+        // Display gallery grid
+        function displayGalleryGrid() {
+            const galleryGrid = document.getElementById('galleryGrid');
+            const emptyGallery = document.getElementById('emptyGallery');
+
+            if (galleryImages.length === 0) {
+                galleryGrid.style.display = 'none';
+                emptyGallery.style.display = 'block';
+                return;
+            }
+
+            galleryGrid.style.display = 'grid';
+            emptyGallery.style.display = 'none';
+
+            galleryGrid.innerHTML = galleryImages.map(image => `
+                <div class="gallery-item ${image.is_main ? 'is-main' : ''}">
+                    <img src="${image.image_url}" alt="${image.title}" loading="lazy">
+                    <div class="gallery-item-content">
+                        <div class="gallery-item-title">${image.title || 'Sem título'}</div>
+                        <div class="gallery-item-type">${getImageTypeLabel(image.image_type)}</div>
+                        <div class="gallery-item-actions">
+                            ${!image.is_main ? `<button class="btn btn-success btn-sm" onclick="setMainImage('${image.id}')">⭐ Principal</button>` : ''}
+                            <button class="btn btn-secondary btn-sm" onclick="editImage('${image.id}')">✏️ Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteImage('${image.id}')">🗑️ Excluir</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get image type label
+        function getImageTypeLabel(type) {
+            const labels = {
+                'exterior': 'Exterior',
+                'interior': 'Interior',
+                'detail': 'Detalhe',
+                'main': 'Principal'
+            };
+            return labels[type] || 'Interior';
+        }
+
+        // Handle image files
+        async function handleImageFiles(files) {
+            if (!currentProperty) {
+                showAlert('Selecione uma propriedade primeiro.', 'error');
+                return;
+            }
+
+            const validFiles = files.filter(file => {
+                const isValidType = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type);
+                const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB
+                
+                if (!isValidType) {
+                    showAlert(`Arquivo ${file.name} não é um formato válido.`, 'error');
+                    return false;
+                }
+                
+                if (!isValidSize) {
+                    showAlert(`Arquivo ${file.name} é muito grande (máx. 10MB).`, 'error');
+                    return false;
+                }
+                
+                return true;
+            });
+
+            if (validFiles.length === 0) return;
+
+            showAlert(`Fazendo upload de ${validFiles.length} imagem(ns)...`, 'info');
+
+            for (const file of validFiles) {
+                try {
+                    await uploadImageToGallery(file);
+                } catch (error) {
+                    console.error('Erro no upload:', error);
+                    showAlert(`Erro ao fazer upload de ${file.name}`, 'error');
+                }
+            }
+
+            displayPropertyGallery();
+            showAlert(`Upload concluído! ${validFiles.length} imagem(ns) adicionada(s).`, 'success');
+        }
+
+        // Upload image to gallery
+        async function uploadImageToGallery(file) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${currentProperty.id}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+            // Upload to storage
+            const { data: uploadData, error: uploadError } = await utils.supabase.storage
+                .from('property-gallery')
+                .upload(fileName, file);
+
+            if (uploadError) throw uploadError;
+
+            // Get public URL
+            const { data: urlData } = utils.supabase.storage
+                .from('property-gallery')
+                .getPublicUrl(fileName);
+
+            // Save to database
+            const imageData = {
+                property_id: currentProperty.id,
+                image_url: urlData.publicUrl,
+                image_type: 'interior',
+                title: file.name.split('.')[0],
+                order_index: galleryImages.length,
+                is_main: galleryImages.length === 0
+            };
+
+            const { data: dbData, error: dbError } = await utils.supabase
+                .from('property_images')
+                .insert([imageData])
+                .select()
+                .single();
+
+            if (dbError) {
+                await utils.supabase.storage
+                    .from('property-gallery')
+                    .remove([fileName]);
+                throw dbError;
+            }
+
+            galleryImages.push(dbData);
+
+            // Update property main image if first image
+            if (galleryImages.length === 1) {
+                await utils.supabase
+                    .from('properties')
+                    .update({ main_image_url: urlData.publicUrl })
+                    .eq('id', currentProperty.id);
+            }
+        }
+
+        // Set main image
+        window.setMainImage = async function(imageId) {
+            try {
+                // Remove main from all images
+                await utils.supabase
+                    .from('property_images')
+                    .update({ is_main: false })
+                    .eq('property_id', currentProperty.id);
+
+                // Set new main image
+                const { data, error } = await utils.supabase
+                    .from('property_images')
+                    .update({ is_main: true })
+                    .eq('id', imageId)
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                // Update property
+                await utils.supabase
+                    .from('properties')
+                    .update({ main_image_url: data.image_url })
+                    .eq('id', currentProperty.id);
+
+                // Update local array
+                galleryImages.forEach(img => {
+                    img.is_main = img.id === imageId;
+                });
+
+                displayPropertyGallery();
+                showAlert('Imagem principal definida com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao definir imagem principal:', error);
+                showAlert('Erro ao definir imagem principal.', 'error');
+            }
+        };
+
+        // Edit image
+        window.editImage = function(imageId) {
+            const image = galleryImages.find(img => img.id === imageId);
+            if (!image) return;
+
+            const newTitle = prompt('Título da imagem:', image.title || '');
+            if (newTitle === null) return;
+
+            const newType = prompt('Tipo da imagem (exterior/interior/detail):', image.image_type || 'interior');
+            if (newType === null) return;
+
+            updateImageInfo(imageId, newTitle, newType);
+        };
+
+        // Update image info
+        async function updateImageInfo(imageId, title, type) {
+            try {
+                const { error } = await utils.supabase
+                    .from('property_images')
+                    .update({ title, image_type: type })
+                    .eq('id', imageId);
+
+                if (error) throw error;
+
+                // Update local array
+                const image = galleryImages.find(img => img.id === imageId);
+                if (image) {
+                    image.title = title;
+                    image.image_type = type;
+                }
+
+                displayPropertyGallery();
+                showAlert('Informações da imagem atualizadas!', 'success');
+            } catch (error) {
+                console.error('Erro ao atualizar imagem:', error);
+                showAlert('Erro ao atualizar informações da imagem.', 'error');
+            }
+        }
+
+        // Delete image
+        window.deleteImage = async function(imageId) {
+            if (!confirm('Tem certeza que deseja excluir esta imagem?')) return;
+
+            try {
+                const image = galleryImages.find(img => img.id === imageId);
+                if (!image) return;
+
+                // Remove from storage
+                const fileName = image.image_url.split('/').pop();
+                const storagePath = `${currentProperty.id}/${fileName}`;
+                
+                await utils.supabase.storage
+                    .from('property-gallery')
+                    .remove([storagePath]);
+
+                // Remove from database
+                const { error } = await utils.supabase
+                    .from('property_images')
+                    .delete()
+                    .eq('id', imageId);
+
+                if (error) throw error;
+
+                // Update local array
+                galleryImages = galleryImages.filter(img => img.id !== imageId);
+
+                // If was main image, set new main
+                if (image.is_main && galleryImages.length > 0) {
+                    await setMainImage(galleryImages[0].id);
+                } else if (galleryImages.length === 0) {
+                    await utils.supabase
+                        .from('properties')
+                        .update({ main_image_url: null })
+                        .eq('id', currentProperty.id);
+                }
+
+                displayPropertyGallery();
+                showAlert('Imagem excluída com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao excluir imagem:', error);
+                showAlert('Erro ao excluir imagem.', 'error');
+            }
+        };
+
+        // Show alert
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Show loading
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('galleryContent').style.display = 'none';
+        }
+
+        // Hide loading
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('galleryContent').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

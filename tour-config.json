@@ -1,0 +1,215 @@
+{
+  "property": {
+    "title": "Apartamento Premium - Vista Mar",
+    "description": "Luxuoso apartamento com 3 suítes e vista panorâmica",
+    "address": "Av. Atlântica, 1000 - Copacabana, Rio de Janeiro",
+    "price": "R$ 2.500.000",
+    "area": "180m²",
+    "bedrooms": 3,
+    "bathrooms": 3,
+    "parking": 2
+  },
+  "tour": {
+    "autoLoad": true,
+    "showControls": false,
+    "sceneFadeDuration": 1000,
+    "defaultHfov": 110,
+    "maxHfov": 120,
+    "minHfov": 50
+  },
+  "scenes": {
+    "living_room": {
+      "id": "living_room",
+      "title": "Sala de Estar",
+      "description": "Ampla sala integrada com varanda gourmet",
+      "panorama": "./file-1755566234737-636002416.jpg",
+      "initialView": {
+        "pitch": -3,
+        "yaw": 117,
+        "hfov": 110
+      },
+      "hotspots": [
+        {
+          "id": "living_area",
+          "type": "info",
+          "position": {
+            "pitch": -2.1,
+            "yaw": 132.9
+          },
+          "title": "Área Social Premium",
+          "description": "Sala de estar com pé-direito duplo, acabamentos em mármore e vista panorâmica para o mar. Ambiente climatizado com sistema de som integrado.",
+          "features": [
+            "Pé-direito duplo (5m)",
+            "Piso em mármore Carrara",
+            "Sistema de som ambiente",
+            "Ar-condicionado central",
+            "Vista panorâmica para o mar"
+          ],
+          "icon": "🏠"
+        },
+        {
+          "id": "architecture_details",
+          "type": "info", 
+          "position": {
+            "pitch": 14.1,
+            "yaw": 1.5
+          },
+          "title": "Detalhes Arquitetônicos",
+          "description": "Projeto assinado por renomado arquiteto, com elementos únicos e acabamentos de luxo importados.",
+          "features": [
+            "Projeto arquitetônico exclusivo",
+            "Acabamentos importados",
+            "Iluminação LED integrada",
+            "Molduras em gesso especial",
+            "Esquadrias de alumínio premium"
+          ],
+          "icon": "🏛️"
+        },
+        {
+          "id": "to_bedroom",
+          "type": "navigation",
+          "position": {
+            "pitch": -0.9,
+            "yaw": 222.6
+          },
+          "title": "Ir para Suíte Master",
+          "description": "Navegue para o quarto principal",
+          "targetScene": "bedroom",
+          "targetView": {
+            "pitch": 2,
+            "yaw": -23
+          },
+          "icon": "🚪"
+        }
+      ]
+    },
+    "bedroom": {
+      "id": "bedroom",
+      "title": "Suíte Master",
+      "description": "Quarto principal com closet e banheiro privativos",
+      "panorama": "./file-1755614332574-909944521.JPG",
+      "initialView": {
+        "pitch": -3,
+        "yaw": 117,
+        "hfov": 110
+      },
+      "hotspots": [
+        {
+          "id": "master_suite",
+          "type": "info",
+          "position": {
+            "pitch": 2.1,
+            "yaw": -93.6
+          },
+          "title": "Suíte Master Premium",
+          "description": "Amplo quarto principal com closet integrado, banheiro com hidromassagem e varanda privativa com vista para o mar.",
+          "features": [
+            "Closet integrado (15m²)",
+            "Banheiro com hidromassagem",
+            "Varanda privativa",
+            "Ar-condicionado split",
+            "Blackout automatizado",
+            "Vista lateral para o mar"
+          ],
+          "icon": "🛏️"
+        },
+        {
+          "id": "to_living",
+          "type": "navigation",
+          "position": {
+            "pitch": -0.9,
+            "yaw": 222.6
+          },
+          "title": "Voltar à Sala",
+          "description": "Retornar para a área social",
+          "targetScene": "living_room",
+          "targetView": {
+            "pitch": 2,
+            "yaw": -23
+          },
+          "icon": "↩️"
+        }
+      ]
+    }
+  },
+  "ui": {
+    "theme": {
+      "primaryColor": "#007bff",
+      "secondaryColor": "#6c757d",
+      "accentColor": "#28a745",
+      "backgroundColor": "#000000",
+      "textColor": "#ffffff"
+    },
+    "controls": {
+      "showAutoRotate": true,
+      "showFullscreen": true,
+      "showReset": true,
+      "showSceneNavigation": true,
+      "showPropertyInfo": true
+    },
+    "mobile": {
+      "adaptiveUI": true,
+      "touchControls": true,
+      "gyroscope": false
+    }
+  },
+  "hotspotStyles": {
+    "info": {
+      "backgroundColor": "#007bff",
+      "borderColor": "#ffffff",
+      "textColor": "#ffffff",
+      "hoverScale": 1.2,
+      "pulseAnimation": true
+    },
+    "navigation": {
+      "backgroundColor": "#28a745",
+      "borderColor": "#ffffff", 
+      "textColor": "#ffffff",
+      "hoverScale": 1.3,
+      "pulseAnimation": true
+    }
+  },
+  "analytics": {
+    "trackHotspotClicks": true,
+    "trackSceneChanges": true,
+    "trackViewTime": true,
+    "trackNavigationPatterns": true
+  },
+  "seo": {
+    "title": "Tour Virtual 360° - Apartamento Premium Vista Mar",
+    "description": "Explore este luxuoso apartamento através de um tour virtual 360° interativo. 3 suítes, vista para o mar, acabamentos premium.",
+    "keywords": ["tour virtual", "apartamento", "imóvel", "360°", "vista mar", "luxo"],
+    "ogImage": "./file-1755566234737-636002416.jpg"
+  },
+  "performance": {
+    "imageQuality": "high",
+    "preloadNextScene": true,
+    "lazyLoadHotspots": false,
+    "compressionLevel": 0.8
+  },
+  "accessibility": {
+    "keyboardNavigation": true,
+    "screenReaderSupport": true,
+    "highContrast": false,
+    "altTexts": {
+      "living_room": "Sala de estar ampla com vista panorâmica",
+      "bedroom": "Suíte master com closet e banheiro privativos"
+    }
+  },
+  "validation": {
+    "hotspotPositionAccuracy": {
+      "tolerance": 0.1,
+      "testPositions": [
+        {"yaw": 0, "pitch": 0},
+        {"yaw": 90, "pitch": 10},
+        {"yaw": 180, "pitch": -10},
+        {"yaw": 270, "pitch": 5}
+      ]
+    },
+    "performanceMetrics": {
+      "maxLoadTime": 3000,
+      "minFPS": 30,
+      "maxMemoryUsage": "100MB"
+    }
+  }
+}

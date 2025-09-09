@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Login</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .alert { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>🏠 Teste de Login</h1>
+    
+    <div id="alert" style="display: none;"></div>
+    
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Senha:</label>
+            <input type="password" id="password" required>
+        </div>
+        
+        <button type="submit" id="loginBtn">Entrar</button>
+    </form>
+    
+    <p><a href="test-register.html">Criar conta</a></p>
+
+    <script type="module">
+        // Importar diretamente do CDN
+        const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js@2');
+        
+        // Configurar cliente
+        const SUPABASE_URL = 'https://ewivsujoqdnltdktkyvh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3aXZzdWpvcWRubHRka3RreXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNjIwMzAsImV4cCI6MjA3MjkzODAzMH0.qcSgD6XCJvVj1UsltzvqXeHEBU0fMHB9e25CID4M9Yo';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        console.log('Supabase configurado');
+        
+        // Elementos DOM
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const alert = document.getElementById('alert');
+        
+        // Função para mostrar alerta
+        function showAlert(message, type = 'error') {
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.display = 'block';
+        }
+        
+        // Verificar se já está logado
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            showAlert('Usuário já está logado: ' + user.email, 'success');
+        }
+        
+        // Escutar mudanças de autenticação
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth change:', event, session);
+            if (session) {
+                showAlert('Login realizado com sucesso! Usuário: ' + session.user.email, 'success');
+                setTimeout(() => {
+                    window.location.href = '/admin/index.html';
+                }, 2000);
+            }
+        });
+        
+        // Submissão do formulário
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showAlert('Por favor, preencha todos os campos.');
+                return;
+            }
+            
+            loginBtn.textContent = 'Entrando...';
+            loginBtn.disabled = true;
+            alert.style.display = 'none';
+            
+            try {
+                console.log('Tentando login com:', email);
+                
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) {
+                    console.error('Erro de login:', error);
+                    showAlert('Erro: ' + error.message);
+                } else {
+                    console.log('Login bem-sucedido:', data);
+                    showAlert('Login realizado com sucesso!', 'success');
+                }
+                
+            } catch (error) {
+                console.error('Erro geral:', error);
+                showAlert('Erro inesperado: ' + error.message);
+            } finally {
+                loginBtn.textContent = 'Entrar';
+                loginBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Marzipano - Tour Virtual 360°</title>
+    <script src="https://cdn.jsdelivr.net/npm/marzipano@0.10.2/dist/marzipano.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #000;
+        }
+        
+        #pano {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .controls button {
+            margin: 5px;
+            padding: 8px 12px;
+            background: #6f42c1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .controls button:hover {
+            background: #5a32a3;
+        }
+        
+        .info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            max-width: 300px;
+        }
+        
+        .hotspot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 3px solid white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        
+        .hotspot:hover {
+            transform: scale(1.2);
+        }
+        
+        .hotspot.info {
+            background: #dc3545;
+        }
+        
+        .hotspot.navigation {
+            background: #28a745;
+        }
+        
+        .hotspot.test {
+            background: #ff00ff;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 200px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h3>Teste Marzipano - Hotspots Fixos</h3>
+        <button onclick="switchScene('scene1')">Cena 1</button>
+        <button onclick="switchScene('scene2')">Cena 2</button>
+        <button onclick="addTestHotspot()">Adicionar Hotspot Teste</button>
+        <button onclick="testNavigation()">Teste Navegação</button>
+        <button onclick="toggleHotspots()">Toggle Hotspots</button>
+    </div>
+    
+    <div class="info">
+        <h4>Teste de Ancoragem de Hotspots</h4>
+        <p>Os hotspots devem permanecer fixos nas coordenadas esféricas específicas durante toda a navegação.</p>
+        <p><strong>Instruções:</strong></p>
+        <ul>
+            <li>Navegue pela cena (arrastar, zoom)</li>
+            <li>Observe se os hotspots permanecem alinhados</li>
+            <li>Clique nos hotspots para interagir</li>
+        </ul>
+    </div>
+
+    <div id="pano"></div>
+
+    <script>
+        let viewer;
+        let scene;
+        let currentSceneId = 'scene1';
+        let hotspots = [];
+        let hotspotsVisible = true;
+        
+        // Configuração das cenas
+        const scenes = {
+            scene1: {
+                name: 'Ambiente 1',
+                source: './file-1755566234737-636002416.jpg',
+                hotspots: [
+                    {
+                        id: 'hotspot1',
+                        yaw: Math.PI * 132.9 / 180,
+                        pitch: Math.PI * -2.1 / 180,
+                        type: 'info',
+                        title: 'Sala de Estar',
+                        content: 'Ampla sala com vista panorâmica',
+                        text: '1'
+                    },
+                    {
+                        id: 'hotspot2',
+                        yaw: Math.PI * 1.5 / 180,
+                        pitch: Math.PI * 14.1 / 180,
+                        type: 'info',
+                        title: 'Detalhes Arquitetônicos',
+                        content: 'Características únicas do projeto',
+                        text: 'i'
+                    },
+                    {
+                        id: 'hotspot3',
+                        yaw: Math.PI * 222.6 / 180,
+                        pitch: Math.PI * -0.9 / 180,
+                        type: 'navigation',
+                        title: 'Ir para Ambiente 2',
+                        content: 'Clique para navegar para a próxima cena',
+                        text: '→',
+                        target: 'scene2'
+                    }
+                ]
+            },
+            scene2: {
+                name: 'Ambiente 2',
+                source: './file-1755614332574-909944521.JPG',
+                hotspots: [
+                    {
+                        id: 'hotspot4',
+                        yaw: Math.PI * -93.6 / 180,
+                        pitch: Math.PI * 2.1 / 180,
+                        type: 'info',
+                        title: 'Área Especial',
+                        content: 'Características únicas deste ambiente',
+                        text: '2'
+                    },
+                    {
+                        id: 'hotspot5',
+                        yaw: Math.PI * 222.6 / 180,
+                        pitch: Math.PI * -0.9 / 180,
+                        type: 'navigation',
+                        title: 'Voltar para Ambiente 1',
+                        content: 'Retornar à cena anterior',
+                        text: '←',
+                        target: 'scene1'
+                    }
+                ]
+            }
+        };
+
+        // Inicializar o viewer
+        function initViewer() {
+            // Criar viewer
+            viewer = new Marzipano.Viewer(document.getElementById('pano'));
+            
+            // Carregar primeira cena
+            loadScene('scene1');
+            
+            // Event listeners
+            viewer.addEventListener('viewChange', function() {
+                console.log('View mudou - Verificando posições dos hotspots');
+                logHotspotPositions();
+            });
+        }
+
+        // Função para carregar cena
+        function loadScene(sceneId) {
+            const sceneData = scenes[sceneId];
+            if (!sceneData) return;
+            
+            currentSceneId = sceneId;
+            
+            // Criar source da imagem
+            const source = Marzipano.ImageUrlSource.fromString(sceneData.source);
+            
+            // Criar geometry
+            const geometry = new Marzipano.EquirectGeometry([{ width: 4096 }]);
+            
+            // Criar view
+            const view = new Marzipano.RectilinearView();
+            
+            // Criar scene
+            scene = viewer.createScene({
+                source: source,
+                geometry: geometry,
+                view: view,
+                pinFirstLevel: true
+            });
+            
+            // Exibir scene
+            scene.switchTo();
+            
+            // Limpar hotspots anteriores
+            clearHotspots();
+            
+            // Adicionar hotspots
+            sceneData.hotspots.forEach(hotspotData => {
+                addHotspot(hotspotData);
+            });
+            
+            console.log(`Cena carregada: ${sceneData.name}`);
+            setTimeout(logHotspotPositions, 500);
+        }
+
+        // Função para adicionar hotspot
+        function addHotspot(hotspotData) {
+            // Criar elemento do hotspot
+            const hotspotElement = document.createElement('div');
+            hotspotElement.className = `hotspot ${hotspotData.type}`;
+            hotspotElement.textContent = hotspotData.text;
+            hotspotElement.setAttribute('data-id', hotspotData.id);
+            
+            // Adicionar event listeners
+            hotspotElement.addEventListener('click', function() {
+                handleHotspotClick(hotspotData);
+            });
+            
+            hotspotElement.addEventListener('mouseenter', function(e) {
+                showTooltip(e, hotspotData);
+            });
+            
+            hotspotElement.addEventListener('mouseleave', function() {
+                hideTooltip();
+            });
+            
+            // Criar hotspot no Marzipano
+            const hotspot = scene.hotspotContainer().createHotspot(hotspotElement, {
+                yaw: hotspotData.yaw,
+                pitch: hotspotData.pitch
+            });
+            
+            hotspots.push({
+                element: hotspotElement,
+                hotspot: hotspot,
+                data: hotspotData
+            });
+        }
+
+        // Função para lidar com clique no hotspot
+        function handleHotspotClick(hotspotData) {
+            console.log('Hotspot clicado:', hotspotData.id);
+            
+            if (hotspotData.type === 'navigation' && hotspotData.target) {
+                switchScene(hotspotData.target);
+            } else {
+                showHotspotInfo(hotspotData.title, hotspotData.content);
+            }
+        }
+
+        // Função para mostrar tooltip
+        function showTooltip(event, hotspotData) {
+            hideTooltip(); // Remove tooltip anterior
+            
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.innerHTML = `<strong>${hotspotData.title}</strong><br>${hotspotData.content}<br><em>Posição fixa em coordenadas esféricas</em>`;
+            
+            document.body.appendChild(tooltip);
+            
+            // Posicionar tooltip
+            const rect = event.target.getBoundingClientRect();
+            tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px';
+            
+            tooltip.id = 'current-tooltip';
+        }
+
+        // Função para esconder tooltip
+        function hideTooltip() {
+            const tooltip = document.getElementById('current-tooltip');
+            if (tooltip) {
+                tooltip.remove();
+            }
+        }
+
+        // Função para mostrar informações do hotspot
+        function showHotspotInfo(title, content) {
+            alert(`${title}\n\n${content}\n\nObserve que este hotspot permanece fixo na posição correta da imagem 360°!`);
+        }
+
+        // Função para limpar hotspots
+        function clearHotspots() {
+            hotspots.forEach(item => {
+                if (item.hotspot && item.hotspot.destroy) {
+                    item.hotspot.destroy();
+                }
+            });
+            hotspots = [];
+            hideTooltip();
+        }
+
+        // Função para registrar posições dos hotspots
+        function logHotspotPositions() {
+            const view = scene.view();
+            const currentYaw = view.yaw();
+            const currentPitch = view.pitch();
+            
+            console.log(`=== Posições dos Hotspots - ${scenes[currentSceneId].name} ===`);
+            console.log(`Posição da câmera: Yaw=${(currentYaw * 180 / Math.PI).toFixed(2)}°, Pitch=${(currentPitch * 180 / Math.PI).toFixed(2)}°`);
+            
+            hotspots.forEach((item, index) => {
+                const data = item.data;
+                console.log(`Hotspot ${index + 1} (${data.id}): Yaw=${(data.yaw * 180 / Math.PI).toFixed(2)}°, Pitch=${(data.pitch * 180 / Math.PI).toFixed(2)}°, Texto="${data.text}"`);
+            });
+        }
+
+        // Função para trocar de cena
+        window.switchScene = function(sceneId) {
+            if (scenes[sceneId]) {
+                loadScene(sceneId);
+            }
+        };
+
+        // Função para adicionar hotspot de teste
+        window.addTestHotspot = function() {
+            const view = scene.view();
+            const currentYaw = view.yaw();
+            const currentPitch = view.pitch();
+            
+            const testHotspot = {
+                id: 'test_' + Date.now(),
+                yaw: currentYaw,
+                pitch: currentPitch,
+                type: 'test',
+                title: 'Hotspot Teste Dinâmico',
+                content: `Hotspot adicionado em Yaw: ${(currentYaw * 180 / Math.PI).toFixed(2)}°, Pitch: ${(currentPitch * 180 / Math.PI).toFixed(2)}°`,
+                text: 'T'
+            };
+            
+            addHotspot(testHotspot);
+            console.log('Hotspot teste adicionado:', testHotspot);
+        };
+
+        // Função para testar navegação
+        window.testNavigation = function() {
+            console.log('=== Iniciando Teste de Navegação Automática ===');
+            
+            const view = scene.view();
+            const initialYaw = view.yaw();
+            const initialPitch = view.pitch();
+            
+            const testPositions = [
+                { yaw: 0, pitch: 0 },
+                { yaw: Math.PI/2, pitch: 0.2 },
+                { yaw: Math.PI, pitch: -0.2 },
+                { yaw: 3*Math.PI/2, pitch: 0.1 },
+                { yaw: initialYaw, pitch: initialPitch }
+            ];
+            
+            let currentTest = 0;
+            
+            function runNextTest() {
+                if (currentTest < testPositions.length) {
+                    const pos = testPositions[currentTest];
+                    console.log(`Teste ${currentTest + 1}: Movendo para Yaw=${(pos.yaw * 180 / Math.PI).toFixed(2)}°, Pitch=${(pos.pitch * 180 / Math.PI).toFixed(2)}°`);
+                    
+                    view.setYaw(pos.yaw);
+                    view.setPitch(pos.pitch);
+                    
+                    setTimeout(() => {
+                        logHotspotPositions();
+                        currentTest++;
+                        runNextTest();
+                    }, 1500);
+                }
+            }
+            
+            runNextTest();
+        };
+
+        // Função para toggle hotspots
+        window.toggleHotspots = function() {
+            hotspotsVisible = !hotspotsVisible;
+            
+            hotspots.forEach(item => {
+                if (item.element) {
+                    item.element.style.display = hotspotsVisible ? 'flex' : 'none';
+                }
+            });
+            
+            console.log(`Hotspots ${hotspotsVisible ? 'exibidos' : 'ocultados'}`);
+        };
+
+        // Inicializar quando a página carregar
+        window.addEventListener('load', initViewer);
+    </script>
+</body>
+</html>

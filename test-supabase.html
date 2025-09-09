@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Supabase</title>
+</head>
+<body>
+    <h1>Teste de Conectividade Supabase</h1>
+    <div id="status">Carregando...</div>
+    <div id="results"></div>
+
+    <script type="module">
+        console.log('Iniciando teste...');
+        
+        try {
+            // Importar diretamente do CDN
+            const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js@2');
+            
+            console.log('Supabase importado com sucesso');
+            
+            // Configurar cliente
+            const SUPABASE_URL = 'https://ewivsujoqdnltdktkyvh.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3aXZzdWpvcWRubHRka3RreXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNjIwMzAsImV4cCI6MjA3MjkzODAzMH0.qcSgD6XCJvVj1UsltzvqXeHEBU0fMHB9e25CID4M9Yo';
+            
+            const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            console.log('Cliente Supabase criado');
+            
+            // Testar conexão
+            const { data, error } = await supabase
+                .from('properties')
+                .select('count')
+                .limit(1);
+            
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            if (error) {
+                console.error('Erro:', error);
+                statusDiv.innerHTML = '❌ Erro na conexão';
+                resultsDiv.innerHTML = `<pre>${JSON.stringify(error, null, 2)}</pre>`;
+            } else {
+                console.log('Sucesso:', data);
+                statusDiv.innerHTML = '✅ Conexão funcionando!';
+                resultsDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            }
+            
+        } catch (error) {
+            console.error('Erro geral:', error);
+            document.getElementById('status').innerHTML = '❌ Erro ao importar Supabase';
+            document.getElementById('results').innerHTML = `<pre>${error.message}</pre>`;
+        }
+    </script>
+</body>
+</html>

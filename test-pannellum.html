@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Pannellum - Tour Virtual 360°</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #000;
+        }
+        
+        #panorama {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .controls button {
+            margin: 5px;
+            padding: 8px 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .controls button:hover {
+            background: #0056b3;
+        }
+        
+        .info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            max-width: 300px;
+        }
+        
+        .hotspot-info {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 200px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h3>Teste Pannellum - Hotspots Fixos</h3>
+        <button onclick="switchScene('scene1')">Cena 1</button>
+        <button onclick="switchScene('scene2')">Cena 2</button>
+        <button onclick="addTestHotspot()">Adicionar Hotspot Teste</button>
+        <button onclick="testNavigation()">Teste Navegação</button>
+    </div>
+    
+    <div class="info">
+        <h4>Teste de Ancoragem de Hotspots</h4>
+        <p>Os hotspots devem permanecer fixos nas posições específicas da imagem 360° durante toda a navegação.</p>
+        <p><strong>Instruções:</strong></p>
+        <ul>
+            <li>Navegue pela cena (arrastar, zoom)</li>
+            <li>Observe se os hotspots permanecem alinhados</li>
+            <li>Teste em diferentes dispositivos</li>
+        </ul>
+    </div>
+
+    <div id="panorama"></div>
+
+    <script>
+        let viewer;
+        let currentScene = 'scene1';
+        
+        // Configuração do tour virtual com hotspots fixos
+        const tourConfig = {
+            "default": {
+                "firstScene": "scene1",
+                "author": "Teste Virtual Tour",
+                "sceneFadeDuration": 1000,
+                "autoLoad": true
+            },
+            "scenes": {
+                "scene1": {
+                    "title": "Ambiente 1",
+                    "hfov": 110,
+                    "pitch": -3,
+                    "yaw": 117,
+                    "type": "equirectangular",
+                    "panorama": "./file-1755566234737-636002416.jpg",
+                    "hotSpots": [
+                        {
+                            "pitch": -2.1,
+                            "yaw": 132.9,
+                            "type": "info",
+                            "text": "Ponto de Interesse 1",
+                            "URL": "javascript:showHotspotInfo('Sala de Estar', 'Ampla sala com vista panorâmica')"
+                        },
+                        {
+                            "pitch": 14.1,
+                            "yaw": 1.5,
+                            "type": "info", 
+                            "text": "Detalhes Arquitetônicos",
+                            "URL": "javascript:showHotspotInfo('Arquitetura', 'Detalhes únicos do projeto')"
+                        },
+                        {
+                            "pitch": -0.9,
+                            "yaw": 222.6,
+                            "type": "scene",
+                            "text": "Ir para Ambiente 2",
+                            "sceneId": "scene2",
+                            "targetYaw": -23,
+                            "targetPitch": 2
+                        }
+                    ]
+                },
+                "scene2": {
+                    "title": "Ambiente 2", 
+                    "hfov": 110,
+                    "pitch": -3,
+                    "yaw": 117,
+                    "type": "equirectangular",
+                    "panorama": "./file-1755614332574-909944521.JPG",
+                    "hotSpots": [
+                        {
+                            "pitch": 2.1,
+                            "yaw": -93.6,
+                            "type": "info",
+                            "text": "Área Especial",
+                            "URL": "javascript:showHotspotInfo('Área Especial', 'Características únicas deste ambiente')"
+                        },
+                        {
+                            "pitch": -0.9,
+                            "yaw": 222.6,
+                            "type": "scene",
+                            "text": "Voltar para Ambiente 1", 
+                            "sceneId": "scene1",
+                            "targetYaw": -23,
+                            "targetPitch": 2
+                        }
+                    ]
+                }
+            }
+        };
+
+        // Inicializar o viewer
+        function initViewer() {
+            viewer = pannellum.viewer('panorama', tourConfig);
+            
+            // Event listeners para monitorar navegação
+            viewer.on('load', function() {
+                console.log('Cena carregada:', viewer.getScene());
+                logHotspotPositions();
+            });
+            
+            viewer.on('scenechange', function() {
+                console.log('Mudança de cena para:', viewer.getScene());
+                currentScene = viewer.getScene();
+                logHotspotPositions();
+            });
+            
+            viewer.on('mousedown', function() {
+                console.log('Início da navegação');
+            });
+            
+            viewer.on('mouseup', function() {
+                console.log('Fim da navegação - Verificando posições dos hotspots');
+                setTimeout(logHotspotPositions, 100);
+            });
+        }
+
+        // Função para registrar posições dos hotspots
+        function logHotspotPositions() {
+            const scene = viewer.getScene();
+            const config = tourConfig.scenes[scene];
+            
+            console.log(`=== Posições dos Hotspots - ${config.title} ===`);
+            config.hotSpots.forEach((hotspot, index) => {
+                console.log(`Hotspot ${index + 1}: Pitch=${hotspot.pitch}, Yaw=${hotspot.yaw}, Texto="${hotspot.text}"`);
+            });
+            
+            // Verificar se as posições permanecem consistentes
+            const currentYaw = viewer.getYaw();
+            const currentPitch = viewer.getPitch();
+            console.log(`Posição atual da câmera: Pitch=${currentPitch.toFixed(2)}, Yaw=${currentYaw.toFixed(2)}`);
+        }
+
+        // Função para mostrar informações do hotspot
+        function showHotspotInfo(title, description) {
+            alert(`${title}\n\n${description}\n\nObserve que este hotspot permanece fixo na posição correta da imagem 360°!`);
+        }
+
+        // Função para trocar de cena
+        function switchScene(sceneId) {
+            if (viewer) {
+                viewer.loadScene(sceneId);
+                currentScene = sceneId;
+            }
+        }
+
+        // Função para adicionar hotspot de teste dinamicamente
+        function addTestHotspot() {
+            const currentYaw = viewer.getYaw();
+            const currentPitch = viewer.getPitch();
+            
+            const testHotspot = {
+                "pitch": currentPitch,
+                "yaw": currentYaw,
+                "type": "info",
+                "text": "Hotspot Teste Dinâmico",
+                "URL": `javascript:showHotspotInfo('Teste Dinâmico', 'Hotspot adicionado em Pitch: ${currentPitch.toFixed(2)}, Yaw: ${currentYaw.toFixed(2)}')`
+            };
+            
+            viewer.addHotSpot(testHotspot);
+            console.log('Hotspot teste adicionado:', testHotspot);
+        }
+
+        // Função para testar navegação automática
+        function testNavigation() {
+            console.log('=== Iniciando Teste de Navegação Automática ===');
+            
+            // Salvar posição inicial
+            const initialYaw = viewer.getYaw();
+            const initialPitch = viewer.getPitch();
+            
+            // Navegar para diferentes posições e verificar hotspots
+            const testPositions = [
+                {yaw: 0, pitch: 0},
+                {yaw: 90, pitch: 10},
+                {yaw: 180, pitch: -10},
+                {yaw: 270, pitch: 5},
+                {yaw: initialYaw, pitch: initialPitch}
+            ];
+            
+            let currentTest = 0;
+            
+            function runNextTest() {
+                if (currentTest < testPositions.length) {
+                    const pos = testPositions[currentTest];
+                    console.log(`Teste ${currentTest + 1}: Movendo para Yaw=${pos.yaw}, Pitch=${pos.pitch}`);
+                    
+                    viewer.lookAt(pos.pitch, pos.yaw, 1000);
+                    
+                    setTimeout(() => {
+                        logHotspotPositions();
+                        currentTest++;
+                        runNextTest();
+                    }, 1500);
+                }
+            }
+            
+            runNextTest();
+        }
+
+        // Inicializar quando a página carregar
+        window.addEventListener('load', initViewer);
+    </script>
+</body>
+</html>

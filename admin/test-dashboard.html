@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Teste - Tours Virtuais 360°</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .dashboard-header {
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .status-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .status-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .status-value {
+            color: #007bff;
+            font-family: monospace;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        .btn.danger:hover {
+            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>🎉 Dashboard de Teste</h1>
+            <p>Sistema de autenticação funcionando corretamente!</p>
+        </div>
+
+        <div class="status-info">
+            <h3>📊 Status da Autenticação</h3>
+            <div class="status-item">
+                <span class="status-label">Status:</span>
+                <span class="status-value success" id="authStatus">✅ Autenticado</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Modo:</span>
+                <span class="status-value" id="authMode">🧪 Teste</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Email:</span>
+                <span class="status-value" id="userEmail">admin@tours360.com</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">URL Atual:</span>
+                <span class="status-value" id="currentUrl">-</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Timestamp:</span>
+                <span class="status-value" id="timestamp">-</span>
+            </div>
+        </div>
+
+        <div>
+            <button class="btn" onclick="refreshStatus()">🔄 Atualizar Status</button>
+            <button class="btn" onclick="testNavigation()">🏠 Ir para Dashboard Principal</button>
+            <button class="btn danger" onclick="logout()">🚪 Logout</button>
+        </div>
+
+        <div class="status-info">
+            <h3>🔧 Debug Info</h3>
+            <div id="debugInfo" style="font-family: monospace; font-size: 12px; color: #666;">
+                Carregando...
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Importar auth guard corrigido
+        import './auth-guard-fixed.js';
+
+        function updateStatus() {
+            // Atualizar informações na tela
+            document.getElementById('currentUrl').textContent = window.location.href;
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            
+            // Verificar localStorage
+            const testLogin = localStorage.getItem('test_admin_logged_in');
+            const testEmail = localStorage.getItem('test_admin_email');
+            
+            if (testLogin === 'true') {
+                document.getElementById('authStatus').textContent = '✅ Autenticado';
+                document.getElementById('authStatus').className = 'status-value success';
+                document.getElementById('authMode').textContent = '🧪 Teste';
+                document.getElementById('userEmail').textContent = testEmail || 'admin@tours360.com';
+            } else {
+                document.getElementById('authStatus').textContent = '❌ Não Autenticado';
+                document.getElementById('authStatus').className = 'status-value error';
+                document.getElementById('authMode').textContent = '🔐 Normal';
+                document.getElementById('userEmail').textContent = '-';
+            }
+
+            // Debug info
+            const debugInfo = {
+                localStorage: Object.keys(localStorage).map(key => ({key, value: localStorage.getItem(key)})),
+                sessionStorage: Object.keys(sessionStorage).map(key => ({key, value: sessionStorage.getItem(key)})),
+                authGuardStatus: window.simpleAuthGuard ? window.simpleAuthGuard.getStatus() : 'Não carregado'
+            };
+
+            document.getElementById('debugInfo').innerHTML = JSON.stringify(debugInfo, null, 2);
+        }
+
+        // Funções globais
+        window.refreshStatus = function() {
+            updateStatus();
+            console.log('Status atualizado');
+        };
+
+        window.testNavigation = function() {
+            console.log('Navegando para dashboard principal...');
+            window.location.href = 'index.html';
+        };
+
+        window.logout = function() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                localStorage.removeItem('test_admin_logged_in');
+                localStorage.removeItem('test_admin_email');
+                window.location.href = 'login-fixed.html';
+            }
+        };
+
+        // Atualizar status quando a página carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus();
+            
+            // Atualizar a cada 2 segundos
+            setInterval(updateStatus, 2000);
+        });
+
+        // Atualizar imediatamente
+        updateStatus();
+    </script>
+</body>
+</html>

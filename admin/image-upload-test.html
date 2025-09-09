@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Upload de Imagens 360° - Sistema de Tours Virtuais</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .back-link {
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .preview-container {
+            display: none;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .image-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .image-info h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .image-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .progress-container {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 20px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .requirements {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .requirements h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .requirements ul {
+            color: #666;
+            padding-left: 20px;
+        }
+
+        .requirements li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📸 Teste Upload de Imagens 360°</h1>
+            <p>Teste de funcionalidade de upload e validação</p>
+        </div>
+
+        <div class="content">
+            <a href="index.html" class="back-link">← Voltar ao Dashboard</a>
+
+            <div class="requirements">
+                <h4>📋 Requisitos da Imagem:</h4>
+                <ul>
+                    <li>Formato: JPEG, PNG ou WebP</li>
+                    <li>Proporção: 2:1 (equiretangular)</li>
+                    <li>Tamanho máximo: 50MB</li>
+                    <li>Tipo: Panorama equiretangular</li>
+                </ul>
+            </div>
+
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Clique aqui ou arraste uma imagem 360°</div>
+                <div class="upload-hint">Suporte para JPEG, PNG e WebP</div>
+                <input type="file" id="fileInput" class="file-input" accept="image/*">
+            </div>
+
+            <div class="preview-container" id="previewContainer">
+                <h4>Preview da Imagem:</h4>
+                <img id="previewImage" class="preview-image" alt="Preview">
+            </div>
+
+            <div class="image-info" id="imageInfo"></div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Preparando upload...</div>
+            </div>
+
+            <div class="alert alert-success" id="successAlert"></div>
+            <div class="alert alert-error" id="errorAlert"></div>
+            <div class="alert alert-info" id="infoAlert"></div>
+
+            <div style="text-align: center;">
+                <button class="btn" id="uploadBtn" disabled>📤 Simular Upload</button>
+                <button class="btn" id="cancelBtn" style="display: none;">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+
+        // Elementos DOM
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const successAlert = document.getElementById('successAlert');
+        const errorAlert = document.getElementById('errorAlert');
+        const infoAlert = document.getElementById('infoAlert');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const imageInfo = document.getElementById('imageInfo');
+
+        // Event listeners
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+        uploadBtn.addEventListener('click', handleUpload);
+        cancelBtn.addEventListener('click', handleCancel);
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        async function handleFile(file) {
+            selectedFile = file;
+            hideAlerts();
+
+            // Mostrar preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            // Validar arquivo
+            showInfo('Validando imagem...');
+            
+            try {
+                // Validação básica
+                const basicValidation = validateImage(file);
+                if (!basicValidation.valid) {
+                    showError(basicValidation.error);
+                    return;
+                }
+
+                // Validação de dimensões
+                const dimensionValidation = await validateImageDimensions(file);
+                if (!dimensionValidation.valid) {
+                    showError(dimensionValidation.error);
+                    return;
+                }
+
+                // Mostrar informações da imagem
+                const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                imageInfo.innerHTML = `
+                    <h4>Informações da Imagem:</h4>
+                    <p><strong>Nome:</strong> ${file.name}</p>
+                    <p><strong>Tamanho:</strong> ${sizeInMB} MB</p>
+                    <p><strong>Dimensões:</strong> ${dimensionValidation.width} x ${dimensionValidation.height}</p>
+                    <p><strong>Proporção:</strong> ${dimensionValidation.ratio.toFixed(2)}:1</p>
+                    <p><strong>Formato:</strong> ${file.type}</p>
+                `;
+
+                showSuccess('✅ Imagem válida! Pronta para upload.');
+                uploadBtn.disabled = false;
+
+            } catch (error) {
+                showError('Erro ao validar imagem: ' + error.message);
+            }
+        }
+
+        // Validar imagem 360°
+        function validateImage(file) {
+            // Verificar tipo de arquivo
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                return { 
+                    valid: false, 
+                    error: 'Tipo de arquivo não suportado. Use JPEG, PNG ou WebP.' 
+                };
+            }
+
+            // Verificar tamanho (50MB)
+            const maxSize = 50 * 1024 * 1024; // 50MB em bytes
+            if (file.size > maxSize) {
+                return { 
+                    valid: false, 
+                    error: 'Arquivo muito grande. Tamanho máximo: 50MB.' 
+                };
+            }
+
+            return { valid: true };
+        }
+
+        // Validar proporção da imagem (deve ser 2:1)
+        async function validateImageDimensions(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = function() {
+                    const ratio = this.width / this.height;
+                    const isValid = Math.abs(ratio - 2.0) < 0.1; // Tolerância de 10%
+                    
+                    resolve({
+                        valid: isValid,
+                        width: this.width,
+                        height: this.height,
+                        ratio: ratio,
+                        error: isValid ? null : `Proporção inválida (${ratio.toFixed(2)}:1). Imagens 360° devem ter proporção 2:1.`
+                    });
+                };
+                img.onerror = function() {
+                    resolve({
+                        valid: false,
+                        error: 'Não foi possível carregar a imagem.'
+                    });
+                };
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        async function handleUpload() {
+            if (!selectedFile) return;
+
+            uploadBtn.disabled = true;
+            cancelBtn.style.display = 'inline-block';
+            progressContainer.style.display = 'block';
+            hideAlerts();
+
+            try {
+                // Simular progresso de upload
+                updateProgress(10, 'Preparando upload...');
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                updateProgress(30, 'Enviando imagem...');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                updateProgress(60, 'Processando...');
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                updateProgress(90, 'Finalizando...');
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                updateProgress(100, 'Upload concluído!');
+                
+                // Simular URL de resultado
+                const mockUrl = `https://example.com/tour-images/test-user-id/temp-property/${Date.now()}_360.jpg`;
+                showSuccess(`✅ Upload simulado com sucesso! URL: ${mockUrl}`);
+                
+                // Reset após sucesso
+                setTimeout(() => {
+                    resetForm();
+                }, 3000);
+
+            } catch (error) {
+                showError('Erro no upload: ' + error.message);
+                resetForm();
+            }
+        }
+
+        function handleCancel() {
+            resetForm();
+        }
+
+        function resetForm() {
+            selectedFile = null;
+            fileInput.value = '';
+            uploadBtn.disabled = true;
+            cancelBtn.style.display = 'none';
+            progressContainer.style.display = 'none';
+            previewContainer.style.display = 'none';
+            updateProgress(0, '');
+            hideAlerts();
+        }
+
+        function updateProgress(percent, text) {
+            progressFill.style.width = percent + '%';
+            progressText.textContent = text;
+        }
+
+        function showSuccess(message) {
+            hideAlerts();
+            successAlert.textContent = message;
+            successAlert.style.display = 'block';
+        }
+
+        function showError(message) {
+            hideAlerts();
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+        }
+
+        function showInfo(message) {
+            hideAlerts();
+            infoAlert.textContent = message;
+            infoAlert.style.display = 'block';
+        }
+
+        function hideAlerts() {
+            successAlert.style.display = 'none';
+            errorAlert.style.display = 'none';
+            infoAlert.style.display = 'none';
+        }
+    </script>
+
+    <script type="module">
+        import './auth-guard-fixed.js';
+    </script>
+</body>
+</html>

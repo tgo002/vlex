@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Administrativo - Tours Virtuais 360°</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .login-header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .login-form {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .admin-notice {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+
+        .debug-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .test-login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .test-login-link a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>🔐 Acesso Administrativo</h1>
+            <p>Sistema Restrito - Apenas Administradores</p>
+        </div>
+
+        <div class="login-form">
+            <div id="alert" class="alert"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required 
+                        placeholder="admin@tours360.com"
+                        value="admin@tours360.com"
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        placeholder="Admin@Tours360!2024"
+                        value="Admin@Tours360!2024"
+                        autocomplete="current-password"
+                    >
+                </div>
+
+                <button type="submit" class="btn" id="loginBtn">
+                    Entrar
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Fazendo login...</p>
+            </div>
+
+            <div class="test-login-link">
+                <a href="test-login.html">🧪 Login de Teste (Bypass)</a>
+            </div>
+
+            <div class="admin-notice">
+                <span class="icon">🔐</span>
+                <p>Acesso Restrito - Apenas Administradores</p>
+            </div>
+
+            <div class="debug-info" id="debugInfo">
+                <strong>Debug Info:</strong><br>
+                <span id="debugText">Carregando...</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { ensureAdminSessionForTest } from '../shared/supabase-client.js';
+        // Sistema de login simplificado e robusto
+        class SimpleLoginManager {
+            constructor() {
+                this.isProcessing = false;
+                this.debugElement = document.getElementById('debugText');
+                this.init();
+            }
+
+            init() {
+                this.log('Sistema de login inicializado');
+                
+                // Verificar se já está logado
+                this.checkExistingAuth();
+                
+                // Setup do formulário
+                this.setupForm();
+            }
+
+            log(message) {
+                console.log(`🔐 ${message}`);
+                if (this.debugElement) {
+                    this.debugElement.innerHTML += `<br>${new Date().toLocaleTimeString()}: ${message}`;
+                }
+            }
+
+            async checkExistingAuth() {
+                // Verificar localStorage de teste
+                const testLogin = localStorage.getItem('test_admin_logged_in');
+                if (testLogin === 'true') {
+                    this.log('Login de teste detectado, garantindo sessão Supabase...');
+                    try { await ensureAdminSessionForTest(); } catch {}
+                    this.redirectToDashboard();
+                    return;
+                }
+
+                // Verificar token do Supabase
+                const authToken = localStorage.getItem('sb-ewivsujoqdnltdktkyvh-auth-token');
+                if (authToken) {
+                    try {
+                        const tokenData = JSON.parse(authToken);
+                        if (tokenData.access_token) {
+                            this.log('Token Supabase encontrado, redirecionando...');
+                            this.redirectToDashboard();
+                            return;
+                        }
+                    } catch (e) {
+                        this.log('Token inválido encontrado');
+                    }
+                }
+
+                this.log('Nenhuma autenticação encontrada');
+            }
+
+            setupForm() {
+                const form = document.getElementById('loginForm');
+                form.addEventListener('submit', (e) => this.handleLogin(e));
+            }
+
+            async handleLogin(e) {
+                e.preventDefault();
+                
+                if (this.isProcessing) {
+                    this.log('Login já em andamento...');
+                    return;
+                }
+
+                this.isProcessing = true;
+                this.showLoading(true);
+                this.hideAlert();
+
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                this.log(`Tentando login com: ${email}`);
+
+                try {
+                    // Simular login bem-sucedido para as credenciais corretas
+                    if (email === 'admin@tours360.com' && password === 'Admin@Tours360!2024') {
+                        this.log('Credenciais corretas - simulando login');
+                        
+                        // Definir como logado no localStorage
+                        localStorage.setItem('test_admin_logged_in', 'true');
+                        localStorage.setItem('test_admin_email', email);
+
+                        // Garantir sessão Supabase para permitir Storage/DB em modo teste
+                        try { await ensureAdminSessionForTest(); } catch {}
+
+                        this.showAlert('Login realizado com sucesso!', 'success');
+
+                        setTimeout(() => {
+                            this.redirectToDashboard();
+                        }, 800);
+                    } else {
+                        this.log('Credenciais incorretas');
+                        this.showAlert('Credenciais inválidas. Verifique email e senha.');
+                    }
+                } catch (error) {
+                    this.log(`Erro no login: ${error.message}`);
+                    this.showAlert('Erro inesperado. Tente novamente.');
+                } finally {
+                    this.isProcessing = false;
+                    this.showLoading(false);
+                }
+            }
+
+            redirectToDashboard() {
+                this.log('Redirecionando para dashboard...');
+                
+                // Verificar se há URL de redirecionamento salva
+                const redirectUrl = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
+                sessionStorage.removeItem('redirectAfterLogin');
+                
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 500);
+            }
+
+            showAlert(message, type = 'error') {
+                const alert = document.getElementById('alert');
+                alert.textContent = message;
+                alert.className = `alert ${type}`;
+                alert.style.display = 'block';
+            }
+
+            hideAlert() {
+                const alert = document.getElementById('alert');
+                alert.style.display = 'none';
+            }
+
+            showLoading(show = true) {
+                const loading = document.getElementById('loading');
+                const loginBtn = document.getElementById('loginBtn');
+                
+                loading.style.display = show ? 'block' : 'none';
+                loginBtn.disabled = show;
+                loginBtn.textContent = show ? 'Entrando...' : 'Entrar';
+            }
+        }
+
+        // Inicializar quando DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', () => {
+            new SimpleLoginManager();
+        });
+    </script>
+</body>
+</html>

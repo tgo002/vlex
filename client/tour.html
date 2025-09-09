@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tour Virtual 360° - Carregando...</title>
+
+    <!-- Meta tags para SEO -->
+    <meta name="description" content="Explore este incrível tour virtual 360° interativo">
+    <meta name="keywords" content="tour virtual, 360°, imóvel, propriedade, realidade virtual">
+    <meta name="author" content="Sistema de Tours Virtuais 360°">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Tour Virtual 360°">
+    <meta property="og:description" content="Explore este incrível tour virtual 360° interativo">
+    <meta property="og:site_name" content="Sistema de Tours Virtuais 360°">
+    <meta property="og:locale" content="pt_BR">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Tour Virtual 360°">
+    <meta name="twitter:description" content="Explore este incrível tour virtual 360° interativo">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+    
+    <!-- Meta tags para SEO e compartilhamento -->
+    <meta name="description" content="Explore este incrível tour virtual 360° interativo">
+    <meta name="keywords" content="tour virtual, 360°, imóvel, propriedade, realidade virtual">
+    <meta name="author" content="Sistema de Tours Virtuais 360°">
+    
+    <!-- Open Graph para redes sociais -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Tour Virtual 360°">
+    <meta property="og:description" content="Explore este incrível tour virtual 360° interativo">
+    <meta property="og:image" content="">
+    <meta property="og:url" content="">
+    <meta property="og:site_name" content="Tours Virtuais 360°">
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Tour Virtual 360°">
+    <meta name="twitter:description" content="Explore este incrível tour virtual 360° interativo">
+    <meta name="twitter:image" content="">
+    
+    <!-- WhatsApp -->
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+    
+    <!-- Pannellum CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tour-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #panorama {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-logo {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        .loading-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .loading-subtitle {
+            font-size: 18px;
+            opacity: 0.8;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-progress {
+            width: 300px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #090979);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .loading-text {
+            font-size: 14px;
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Error Screen */
+        .error-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .error-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+        }
+
+        .error-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            line-height: 1.5;
+            max-width: 600px;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .error-btn {
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .error-btn:hover {
+            background: white;
+            color: #ee5a24;
+        }
+
+        /* Tour Controls */
+        .tour-controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 2000;
+            display: flex;
+            gap: 10px;
+            opacity: 0;
+            animation: fadeInDown 1s ease 2s forwards;
+        }
+
+        .control-btn {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: translateY(-2px);
+        }
+
+        /* Scene Navigator */
+        .scene-navigator {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            animation: fadeInUp 1s ease 2.5s forwards;
+        }
+
+        .scene-thumb {
+            width: 80px;
+            height: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .scene-thumb:hover {
+            transform: scale(1.1);
+            border-color: #007bff;
+        }
+
+        .scene-thumb.active {
+            border-color: #007bff;
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
+        }
+
+        .scene-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scene-thumb-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            color: white;
+            font-size: 10px;
+            padding: 8px 4px 4px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Property Info Panel */
+        .property-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 350px;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            animation: fadeInRight 1s ease 1.5s forwards;
+        }
+
+        .property-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .property-description {
+            font-size: 14px;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .property-specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .spec-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .spec-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .spec-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .spec-label {
+            font-size: 11px;
+            color: #ccc;
+            text-transform: uppercase;
+        }
+
+        .property-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #28a745, #218838);
+        }
+
+        .action-btn.secondary:hover {
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Hotspot Info Modal */
+        .hotspot-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2500;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+        }
+
+        .hotspot-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .hotspot-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .hotspot-modal-close {
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .hotspot-modal-close:hover {
+            color: white;
+        }
+
+        .hotspot-modal-content {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tour-controls {
+                top: 10px;
+                left: 10px;
+                flex-direction: column;
+            }
+
+            .property-info {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                padding: 15px;
+            }
+
+            .property-title {
+                font-size: 20px;
+            }
+
+            .property-specs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .scene-navigator {
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                transform: none;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .scene-thumb {
+                width: 60px;
+                height: 30px;
+            }
+
+            .hotspot-modal {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .property-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .control-btn {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+
+            .property-info {
+                position: relative;
+                top: auto;
+                right: auto;
+                left: auto;
+                margin: 10px;
+                animation: none;
+                opacity: 1;
+            }
+
+            .scene-navigator {
+                position: relative;
+                bottom: auto;
+                left: auto;
+                right: auto;
+                margin: 10px;
+                animation: none;
+                opacity: 1;
+            }
+        }
+
+        /* Custom Hotspot Styles */
+        .pnlm-hotspot-base.hotspot-info {
+            background: #007bff !important;
+            border: 3px solid white !important;
+            border-radius: 50% !important;
+            width: 20px !important;
+            height: 20px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-info:hover {
+            background: #0056b3 !important;
+            transform: scale(1.3) !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-navigation {
+            background: #28a745 !important;
+            border: 3px solid white !important;
+            border-radius: 10% !important;
+            width: 24px !important;
+            height: 24px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-navigation:hover {
+            background: #218838 !important;
+            transform: scale(1.3) !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-highlight {
+            background: #ffc107 !important;
+            border: 3px solid white !important;
+            border-radius: 20% !important;
+            width: 22px !important;
+            height: 22px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-highlight:hover {
+            background: #e0a800 !important;
+            transform: scale(1.3) !important;
+        }
+
+        .pnlm-hotspot-base.hotspot-highlight::after {
+            content: '⭐';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: white;
+            pointer-events: none;
+        }
+
+        /* Hotspot Animations */
+        .pnlm-hotspot-base {
+            animation: hotspot-pulse 2s infinite;
+        }
+
+        @keyframes hotspot-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 123, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
+        }
+
+        .pnlm-hotspot-base.hotspot-navigation {
+            animation: hotspot-pulse-green 2s infinite;
+        }
+
+        @keyframes hotspot-pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+
+        .pnlm-hotspot-base.hotspot-highlight {
+            animation: hotspot-pulse-yellow 2s infinite;
+        }
+
+        @keyframes hotspot-pulse-yellow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="tour-container">
+        <!-- Loading Screen -->
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loading-logo">🏠</div>
+            <h1 class="loading-title">Tour Virtual 360°</h1>
+            <p class="loading-subtitle">Preparando sua experiência imersiva...</p>
+            <div class="loading-spinner"></div>
+            <div class="loading-progress">
+                <div class="loading-progress-bar" id="loadingProgressBar"></div>
+            </div>
+            <div class="loading-text" id="loadingText">Carregando dados...</div>
+        </div>
+
+        <!-- Error Screen -->
+        <div class="error-screen" id="errorScreen">
+            <div class="error-icon">😞</div>
+            <h1 class="error-title">Ops! Algo deu errado</h1>
+            <p class="error-message" id="errorMessage">
+                Não foi possível carregar o tour virtual. Verifique sua conexão com a internet e tente novamente.
+            </p>
+            <div class="error-actions">
+                <button class="error-btn" onclick="retryLoad()">
+                    🔄 Tentar Novamente
+                </button>
+                <a href="/" class="error-btn">
+                    🏠 Página Inicial
+                </a>
+            </div>
+        </div>
+
+        <!-- Panorama Viewer -->
+        <div id="panorama"></div>
+
+        <!-- Tour Controls -->
+        <div class="tour-controls">
+            <button class="control-btn" onclick="toggleFullscreen()">
+                <span>🔍</span> Tela Cheia
+            </button>
+            <button class="control-btn" onclick="toggleAutoRotate()">
+                <span>🔄</span> Auto Rotação
+            </button>
+            <button class="control-btn" onclick="shareTour()">
+                <span>📤</span> Compartilhar
+            </button>
+        </div>
+
+        <!-- Property Info Panel -->
+        <div class="property-info" id="propertyInfo">
+            <h1 class="property-title" id="propertyTitle">Carregando...</h1>
+            <p class="property-description" id="propertyDescription">Preparando informações...</p>
+            
+            <div class="property-specs" id="propertySpecs">
+                <!-- Será preenchido dinamicamente -->
+            </div>
+
+            <div class="property-actions">
+                <button class="action-btn" onclick="showContactForm()">
+                    📞 Entrar em Contato
+                </button>
+                <button class="action-btn secondary" onclick="shareOnWhatsApp()">
+                    💬 WhatsApp
+                </button>
+            </div>
+        </div>
+
+        <!-- Scene Navigator -->
+        <div class="scene-navigator" id="sceneNavigator">
+            <!-- Será preenchido dinamicamente -->
+        </div>
+
+        <!-- Hotspot Info Modal -->
+        <div class="hotspot-modal" id="hotspotModal">
+            <div class="hotspot-modal-header">
+                <h3 class="hotspot-modal-title" id="hotspotModalTitle">Título do Hotspot</h3>
+                <button class="hotspot-modal-close" onclick="closeHotspotModal()">×</button>
+            </div>
+            <div class="hotspot-modal-content" id="hotspotModalContent">
+                Conteúdo do hotspot...
+            </div>
+        </div>
+    </div>
+
+    <!-- Pannellum JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    
+    <script type="module">
+        import { propertyManager, sceneManager, hotspotManager, utils } from '../shared/supabase-client.js';
+        import { ContactForm } from '../shared/contact-form.js';
+        import { SocialShare } from '../shared/social-share.js';
+
+        let propertyId = null;
+        let currentProperty = null;
+        let scenes = [];
+        let currentScene = null;
+        let allHotspots = [];
+        let viewer = null;
+        let isAutoRotating = false;
+        let contactForm = null;
+        let socialShare = null;
+
+        // Inicializar tour
+        async function initTour() {
+            try {
+                // Obter ID da propriedade da URL
+                const urlParams = new URLSearchParams(window.location.search);
+                propertyId = urlParams.get('id');
+                
+                if (!propertyId) {
+                    throw new Error('ID da propriedade não encontrado na URL');
+                }
+
+                updateLoadingProgress(10, 'Carregando propriedade...');
+                await loadProperty();
+                
+                updateLoadingProgress(30, 'Carregando cenas...');
+                await loadScenes();
+                
+                updateLoadingProgress(50, 'Carregando hotspots...');
+                await loadAllHotspots();
+                
+                updateLoadingProgress(70, 'Configurando visualizador...');
+                await initViewer();
+                
+                updateLoadingProgress(90, 'Finalizando...');
+                updateMetaTags();
+                updatePropertyInfo();
+                updateSceneNavigator();
+                initContactForm();
+                initSocialShare();
+                
+                updateLoadingProgress(100, 'Pronto!');
+                
+                // Ocultar loading screen
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                    }, 500);
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Erro ao inicializar tour:', error);
+                showError(error.message);
+            }
+        }
+
+        // Carregar propriedade
+        async function loadProperty() {
+            const result = await propertyManager.getProperty(propertyId);
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Propriedade não encontrada');
+            }
+            
+            currentProperty = result.data;
+            
+            // Verificar se está publicada
+            if (currentProperty.status !== 'published') {
+                throw new Error('Esta propriedade não está disponível publicamente');
+            }
+        }
+
+        // Carregar cenas
+        async function loadScenes() {
+            const result = await sceneManager.getScenes(propertyId);
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Erro ao carregar cenas');
+            }
+            
+            scenes = result.data || [];
+            
+            if (scenes.length === 0) {
+                throw new Error('Nenhuma cena encontrada para esta propriedade');
+            }
+            
+            // Ordenar cenas por order_index
+            scenes.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+            
+            // Definir cena atual (padrão ou primeira)
+            currentScene = scenes.find(s => s.is_default) || scenes[0];
+        }
+
+        // Carregar todos os hotspots
+        async function loadAllHotspots() {
+            allHotspots = [];
+            
+            for (const scene of scenes) {
+                const result = await hotspotManager.getHotspots(scene.id);
+                if (result.success && result.data) {
+                    allHotspots = allHotspots.concat(result.data);
+                }
+            }
+        }
+
+        // Inicializar viewer
+        async function initViewer() {
+            if (!currentScene || scenes.length === 0) return;
+
+            // Criar configuração multi-cena similar ao teste
+            const tourConfig = {
+                default: {
+                    firstScene: 'scene1', // Será ajustado no loop
+                    autoLoad: true,
+                    showControls: true,
+                    showFullscreenCtrl: false,
+                    showZoomCtrl: true,
+                    keyboardZoom: true,
+                    mouseZoom: true
+                },
+                scenes: {}
+            };
+
+            // Adicionar todas as cenas com hotspots já configurados
+            scenes.forEach((scene, index) => {
+                const sceneId = `scene${index + 1}`;
+
+                // Obter hotspots para esta cena
+                const sceneHotspots = allHotspots.filter(h => h.scene_id === scene.id);
+
+                // Converter hotspots para formato Pannellum
+                const hotSpots = sceneHotspots.map(hotspot => {
+                    const hotspotConfig = {
+                        pitch: parseFloat(hotspot.pitch) || 0,
+                        yaw: parseFloat(hotspot.yaw) || 0,
+                        type: hotspot.type === 'navigation' ? 'scene' : 'info',
+                        text: hotspot.title || 'Hotspot'
+                    };
+
+                    if (hotspot.type === 'navigation' && hotspot.target_scene_id) {
+                        // Hotspot de navegação
+                        const targetSceneIndex = scenes.findIndex(s => s.id === hotspot.target_scene_id);
+                        if (targetSceneIndex !== -1) {
+                            hotspotConfig.sceneId = `scene${targetSceneIndex + 1}`;
+                            hotspotConfig.targetYaw = parseFloat(hotspot.target_yaw) || 0;
+                            hotspotConfig.targetPitch = parseFloat(hotspot.target_pitch) || 0;
+                        }
+                    } else {
+                        // Hotspot informativo
+                        hotspotConfig.URL = `javascript:showHotspotInfo('${hotspot.title}', '${hotspot.description || 'Sem descrição'}')`;
+                    }
+
+                    return hotspotConfig;
+                });
+
+                tourConfig.scenes[sceneId] = {
+                    type: 'equirectangular',
+                    panorama: scene.image_url,
+                    pitch: parseFloat(scene.initial_pitch) || 0,
+                    yaw: parseFloat(scene.initial_yaw) || 0,
+                    hfov: parseFloat(scene.initial_hfov) || 110,
+                    hotSpots: hotSpots
+                };
+
+                // Mapear ID original para ID simples
+                if (scene.id === currentScene.id) {
+                    tourConfig.default.firstScene = sceneId;
+                }
+            });
+
+            // Debug: verificar elemento e configuração
+            const panoramaElement = document.getElementById('panorama');
+            console.log('Elemento panorama:', panoramaElement);
+            console.log('Configuração do tour:', JSON.stringify(tourConfig, null, 2));
+
+            try {
+                viewer = pannellum.viewer('panorama', tourConfig);
+                console.log('Viewer criado com sucesso');
+
+                viewer.on('load', () => {
+                    console.log('✅ Cena carregada:', currentScene.title);
+                    console.log('✅ Tour carregado com sucesso!');
+                });
+
+                viewer.on('scenechange', () => {
+                    const currentSceneId = viewer.getScene();
+                    console.log('🔄 Mudança de cena para:', currentSceneId);
+                });
+
+                viewer.on('error', (error) => {
+                    console.error('❌ Erro no viewer:', error);
+                    console.error('Detalhes do erro:', error.message || error);
+                    throw new Error('Erro ao carregar visualizador 360°');
+                });
+
+            } catch (error) {
+                console.error('❌ Erro ao criar viewer:', error);
+                throw error;
+            }
+        }
+
+        // Atualizar progresso de carregamento
+        function updateLoadingProgress(percentage, text) {
+            document.getElementById('loadingProgressBar').style.width = percentage + '%';
+            document.getElementById('loadingText').textContent = text;
+        }
+
+        // Atualizar meta tags para SEO e compartilhamento
+        function updateMetaTags() {
+            const title = `${currentProperty.title} - Tour Virtual 360°`;
+            const description = currentProperty.description ||
+                `Explore ${currentProperty.title} através de um tour virtual 360° interativo.`;
+            const currentUrl = window.location.href;
+            const imageUrl = (currentScene && currentScene.image_url) || currentProperty.thumbnail_url || '';
+
+            // Título da página
+            document.title = title;
+
+            // Meta tags básicas
+            updateOrCreateMetaTag('name', 'description', description);
+            updateOrCreateMetaTag('name', 'keywords', `tour virtual, 360°, ${currentProperty.title}, imóvel, propriedade, realidade virtual`);
+
+            // Open Graph (Facebook, WhatsApp, etc.)
+            updateOrCreateMetaTag('property', 'og:title', title);
+            updateOrCreateMetaTag('property', 'og:description', description);
+            updateOrCreateMetaTag('property', 'og:url', currentUrl);
+            updateOrCreateMetaTag('property', 'og:type', 'website');
+            updateOrCreateMetaTag('property', 'og:site_name', 'Sistema de Tours Virtuais 360°');
+
+            if (imageUrl) {
+                updateOrCreateMetaTag('property', 'og:image', imageUrl);
+                updateOrCreateMetaTag('property', 'og:image:width', '1200');
+                updateOrCreateMetaTag('property', 'og:image:height', '630');
+                updateOrCreateMetaTag('property', 'og:image:alt', `Imagem de ${currentProperty.title}`);
+                updateOrCreateMetaTag('property', 'og:image:type', 'image/jpeg');
+            }
+
+            // Twitter Cards
+            updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
+            updateOrCreateMetaTag('name', 'twitter:title', title);
+            updateOrCreateMetaTag('name', 'twitter:description', description);
+            if (imageUrl) {
+                updateOrCreateMetaTag('name', 'twitter:image', imageUrl);
+            }
+
+            // Schema.org JSON-LD
+            updateStructuredData();
+        }
+
+        // Função auxiliar para criar ou atualizar meta tags
+        function updateOrCreateMetaTag(attribute, name, content) {
+            let meta = document.querySelector(`meta[${attribute}="${name}"]`);
+            if (!meta) {
+                meta = document.createElement('meta');
+                meta.setAttribute(attribute, name);
+                document.head.appendChild(meta);
+            }
+            meta.content = content;
+        }
+
+        // Atualizar dados estruturados (Schema.org)
+        function updateStructuredData() {
+            // Remover script existente se houver
+            const existingScript = document.getElementById('structured-data');
+            if (existingScript) {
+                existingScript.remove();
+            }
+
+            const structuredData = {
+                "@context": "https://schema.org",
+                "@type": "RealEstateAgent",
+                "name": currentProperty.title,
+                "description": currentProperty.description || `Tour virtual 360° de ${currentProperty.title}`,
+                "url": window.location.href,
+                "image": (currentScene && currentScene.image_url) || currentProperty.thumbnail_url,
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": currentProperty.location || "Localização não especificada"
+                },
+                "offers": {
+                    "@type": "Offer",
+                    "availability": "https://schema.org/InStock",
+                    "price": currentProperty.price || "Consulte",
+                    "priceCurrency": "BRL"
+                }
+            };
+
+            const script = document.createElement('script');
+            script.id = 'structured-data';
+            script.type = 'application/ld+json';
+            script.textContent = JSON.stringify(structuredData);
+            document.head.appendChild(script);
+        }
+
+        // Atualizar informações da propriedade
+        function updatePropertyInfo() {
+            document.getElementById('propertyTitle').textContent = currentProperty.title;
+            document.getElementById('propertyDescription').textContent = 
+                currentProperty.description || 'Explore este tour virtual 360°';
+            
+            // Especificações
+            const specs = [];
+            
+            if (currentProperty.bedrooms) {
+                specs.push({
+                    icon: '🛏️',
+                    value: currentProperty.bedrooms,
+                    label: 'Quartos'
+                });
+            }
+            
+            if (currentProperty.bathrooms) {
+                specs.push({
+                    icon: '🚿',
+                    value: currentProperty.bathrooms,
+                    label: 'Banheiros'
+                });
+            }
+            
+            if (currentProperty.area) {
+                specs.push({
+                    icon: '📐',
+                    value: currentProperty.area + 'm²',
+                    label: 'Área'
+                });
+            }
+            
+            if (currentProperty.price) {
+                specs.push({
+                    icon: '💰',
+                    value: utils.formatPrice(currentProperty.price),
+                    label: 'Preço'
+                });
+            }
+            
+            // Adicionar número de cenas
+            specs.push({
+                icon: '📸',
+                value: scenes.length,
+                label: 'Cenas'
+            });
+            
+            const specsContainer = document.getElementById('propertySpecs');
+            specsContainer.innerHTML = specs.map(spec => `
+                <div class="spec-item">
+                    <div class="spec-icon">${spec.icon}</div>
+                    <div class="spec-value">${spec.value}</div>
+                    <div class="spec-label">${spec.label}</div>
+                </div>
+            `).join('');
+        }
+
+        // Atualizar navegador de cenas
+        function updateSceneNavigator() {
+            const navigator = document.getElementById('sceneNavigator');
+            
+            if (scenes.length <= 1) {
+                navigator.style.display = 'none';
+                return;
+            }
+            
+            navigator.innerHTML = scenes.map((scene, index) => `
+                <div class="scene-thumb ${scene.id === currentScene.id ? 'active' : ''}" 
+                     onclick="changeScene('${scene.id}')" 
+                     data-scene-id="${scene.id}">
+                    <img src="${scene.image_url}" alt="${scene.title}" loading="lazy">
+                    <div class="scene-thumb-label">${scene.title}</div>
+                </div>
+            `).join('');
+        }
+
+        // Função para mostrar informações do hotspot (chamada via JavaScript URL)
+        window.showHotspotInfo = function(title, description) {
+            document.getElementById('hotspotModalTitle').textContent = title;
+            document.getElementById('hotspotModalContent').textContent = description;
+            document.getElementById('hotspotModal').style.display = 'block';
+        };
+
+        // Mudar cena
+        window.changeScene = function(sceneId) {
+            const newScene = scenes.find(s => s.id === sceneId);
+            if (!newScene || newScene.id === currentScene.id) return;
+
+            currentScene = newScene;
+            
+            // Atualizar navegador
+            document.querySelectorAll('.scene-thumb').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            document.querySelector(`[data-scene-id="${sceneId}"]`).classList.add('active');
+            
+            // Carregar nova cena
+            viewer.loadScene(currentScene.image_url,
+                currentScene.initial_pitch || 0,
+                currentScene.initial_yaw || 0,
+                currentScene.initial_hfov || 110
+            );
+        };
+
+        // Mostrar modal de hotspot
+        function showHotspotModal(hotspot) {
+            document.getElementById('hotspotModalTitle').textContent = hotspot.title;
+            document.getElementById('hotspotModalContent').textContent = 
+                hotspot.description || 'Sem descrição disponível';
+            
+            document.getElementById('hotspotModal').style.display = 'block';
+        }
+
+        // Fechar modal de hotspot
+        window.closeHotspotModal = function() {
+            document.getElementById('hotspotModal').style.display = 'none';
+        };
+
+        // Toggle fullscreen
+        window.toggleFullscreen = function() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        };
+
+        // Toggle auto rotação
+        window.toggleAutoRotate = function() {
+            if (isAutoRotating) {
+                viewer.stopAutoRotate();
+                isAutoRotating = false;
+            } else {
+                viewer.startAutoRotate(2); // 2 graus por segundo
+                isAutoRotating = true;
+            }
+        };
+
+        // Compartilhar tour
+        window.shareOnWhatsApp = function() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent(`Confira este tour virtual 360° de ${currentProperty.title}!`);
+            window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+        };
+
+        // Compartilhar tour (genérico)
+        window.shareTour = function() {
+            if (navigator.share) {
+                navigator.share({
+                    title: currentProperty.title,
+                    text: `Confira este tour virtual 360° de ${currentProperty.title}!`,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback: copiar URL
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('URL copiada para a área de transferência!');
+                });
+            }
+        };
+
+        // Inicializar formulário de contato
+        function initContactForm() {
+            contactForm = new ContactForm(propertyId, {
+                title: `Interesse em ${currentProperty.title}`,
+                subtitle: 'Deixe seus dados e entraremos em contato',
+                onSuccess: (leadData) => {
+                    console.log('Lead criado:', leadData);
+                    // Opcional: enviar evento para analytics
+                },
+                onError: (error) => {
+                    console.error('Erro no formulário:', error);
+                }
+            });
+        }
+
+        // Inicializar compartilhamento social
+        function initSocialShare() {
+            const currentUrl = window.location.href;
+            const title = `${currentProperty.title} - Tour Virtual 360°`;
+            const description = currentProperty.description || `Explore este incrível imóvel em ${currentProperty.location || 'localização privilegiada'} através de um tour virtual 360°.`;
+
+            socialShare = new SocialShare({
+                title: title,
+                description: description,
+                url: currentUrl,
+                image: currentProperty.thumbnail_url || '',
+                hashtags: ['TourVirtual', 'Imovel', 'RealidadeVirtual', 'Propriedade'],
+                onShare: (platform, url) => {
+                    console.log(`Compartilhado via ${platform}:`, url);
+                    // Opcional: enviar evento para analytics
+                }
+            });
+        }
+
+        // Mostrar formulário de contato
+        window.showContactForm = function() {
+            if (contactForm) {
+                contactForm.show();
+            }
+        };
+
+        // Mostrar modal de compartilhamento
+        window.showShareModal = function() {
+            if (socialShare) {
+                socialShare.show();
+            }
+        };
+
+        // Tentar novamente
+        window.retryLoad = function() {
+            document.getElementById('errorScreen').style.display = 'none';
+            document.getElementById('loadingScreen').style.display = 'flex';
+            document.getElementById('loadingScreen').style.opacity = '1';
+            initTour();
+        };
+
+        // Mostrar erro
+        function showError(message) {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorScreen').style.display = 'flex';
+        }
+
+        // Fechar modal ao clicar fora
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('hotspotModal');
+            if (e.target === modal) {
+                closeHotspotModal();
+            }
+        });
+
+        // Fechar modal com ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeHotspotModal();
+            }
+        });
+
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', initTour);
+    </script>
+</body>
+</html>

@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Tours Virtuais 360°</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border-radius: 25px;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            padding: 8px 15px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-title {
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .page-title p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon.properties {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .stat-icon.published {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .stat-icon.scenes {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        .stat-icon.hotspots {
+            background: linear-gradient(135deg, #6f42c1, #e83e8c);
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .actions-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+        }
+
+        .actions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .actions-header h2 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .quick-action {
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .quick-action:hover {
+            border-color: #007bff;
+            background: #f8f9ff;
+            transform: translateY(-3px);
+        }
+
+        .quick-action-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .quick-action-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .quick-action-desc {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .properties-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .properties-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .properties-header h2 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .properties-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .property-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .property-item:hover {
+            border-color: #007bff;
+            background: #f8f9ff;
+        }
+
+        .property-info {
+            flex: 1;
+        }
+
+        .property-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .property-meta {
+            display: flex;
+            gap: 15px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .property-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .property-status.draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .property-status.published {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .property-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #007bff;
+            color: #007bff;
+        }
+
+        .btn-outline:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 10px;
+            }
+
+            .container {
+                padding: 20px 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .property-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .property-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                🏠 Tours 360°
+            </div>
+            <div class="user-menu">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span id="userName">Carregando...</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-title">
+            <h1>Dashboard</h1>
+            <p>Gerencie seus tours virtuais 360° de forma simples e eficiente</p>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon properties">🏠</div>
+                </div>
+                <div class="stat-value" id="totalProperties">-</div>
+                <div class="stat-label">Total de Propriedades</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon published">✅</div>
+                </div>
+                <div class="stat-value" id="publishedProperties">-</div>
+                <div class="stat-label">Propriedades Publicadas</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon scenes">📸</div>
+                </div>
+                <div class="stat-value" id="totalScenes">-</div>
+                <div class="stat-label">Cenas 360°</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon hotspots">📍</div>
+                </div>
+                <div class="stat-value" id="totalHotspots">-</div>
+                <div class="stat-label">Hotspots Criados</div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="actions-section">
+            <div class="actions-header">
+                <h2>Ações Rápidas</h2>
+                <a href="property-editor.html" class="btn-primary">
+                    ➕ Nova Propriedade
+                </a>
+            </div>
+
+            <div class="quick-actions">
+                <a href="property-editor.html" class="quick-action">
+                    <div class="quick-action-icon">🏠</div>
+                    <div class="quick-action-title">Criar Propriedade</div>
+                    <div class="quick-action-desc">Adicione uma nova propriedade ao sistema</div>
+                </a>
+
+                <a href="gallery-manager.html" class="quick-action">
+                    <div class="quick-action-icon">🖼️</div>
+                    <div class="quick-action-title">Galeria de Imagens</div>
+                    <div class="quick-action-desc">Gerencie fotos convencionais das propriedades</div>
+                </a>
+
+                <a href="image-upload.html" class="quick-action">
+                    <div class="quick-action-icon">📸</div>
+                    <div class="quick-action-title">Upload de Imagens 360°</div>
+                    <div class="quick-action-desc">Faça upload de imagens 360° rapidamente</div>
+                </a>
+
+                <a href="hotspot-editor.html" class="quick-action">
+                    <div class="quick-action-icon">📍</div>
+                    <div class="quick-action-title">Editor de Hotspots</div>
+                    <div class="quick-action-desc">Posicione hotspots nas suas cenas</div>
+                </a>
+
+                <a href="publication-manager.html" class="quick-action">
+                    <div class="quick-action-icon">🌐</div>
+                    <div class="quick-action-title">Publicações</div>
+                    <div class="quick-action-desc">Gerencie status de publicação dos tours</div>
+                </a>
+
+                <a href="leads-manager.html" class="quick-action">
+                    <div class="quick-action-icon">📞</div>
+                    <div class="quick-action-title">Leads</div>
+                    <div class="quick-action-desc">Gerencie contatos e interessados</div>
+                </a>
+
+                <a href="#" class="quick-action" onclick="showAnalytics()">
+                    <div class="quick-action-icon">📊</div>
+                    <div class="quick-action-title">Relatórios</div>
+                    <div class="quick-action-desc">Veja estatísticas dos seus tours</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Lista de Propriedades -->
+        <div class="properties-section">
+            <div class="properties-header">
+                <h2>Suas Propriedades</h2>
+                <a href="property-editor.html" class="btn-primary">
+                    ➕ Adicionar
+                </a>
+            </div>
+
+            <div id="propertiesContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Carregando propriedades...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { authManager, propertyManager, utils } from '../shared/supabase-client.js';
+        // Auth guard antigo removido - usando versão corrigida
+
+        let currentUser = null;
+
+        // Verificar autenticação
+        authManager.onAuthChange((event, session) => {
+            const testLogin = localStorage.getItem('test_admin_logged_in') === 'true';
+            if (!session && testLogin) {
+                currentUser = { email: localStorage.getItem('test_admin_email') || 'admin@tours360.com' };
+                initDashboard();
+                return;
+            }
+            if (!session) {
+                window.location.href = 'login-fixed.html';
+                return;
+            }
+            currentUser = session.user;
+            initDashboard();
+        });
+
+        // Inicializar dashboard
+        async function initDashboard() {
+            if (!currentUser) return;
+
+            // Atualizar informações do usuário
+            updateUserInfo();
+            
+            // Carregar estatísticas
+            await loadStats();
+            
+            // Carregar propriedades
+            await loadProperties();
+        }
+
+        // Atualizar informações do usuário
+        function updateUserInfo() {
+            const userName = document.getElementById('userName');
+            const userAvatar = document.getElementById('userAvatar');
+            
+            const fullName = currentUser.user_metadata?.full_name || currentUser.email;
+            const initials = fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            
+            userName.textContent = fullName;
+            userAvatar.textContent = initials;
+        }
+
+        // Carregar estatísticas
+        async function loadStats() {
+            try {
+                const result = await propertyManager.getUserStats();
+                
+                if (result.success && result.data) {
+                    const stats = result.data;
+                    document.getElementById('totalProperties').textContent = stats.total_properties || 0;
+                    document.getElementById('publishedProperties').textContent = stats.published_properties || 0;
+                    document.getElementById('totalScenes').textContent = stats.total_scenes || 0;
+                    document.getElementById('totalHotspots').textContent = stats.total_hotspots || 0;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+            }
+        }
+
+        // Carregar propriedades
+        async function loadProperties() {
+            const container = document.getElementById('propertiesContainer');
+            
+            try {
+                const result = await propertyManager.getProperties();
+                
+                if (result.success) {
+                    const properties = result.data || [];
+                    
+                    if (properties.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🏠</div>
+                                <h3>Nenhuma propriedade encontrada</h3>
+                                <p>Comece criando sua primeira propriedade para tours virtuais 360°</p>
+                                <a href="property-editor.html" class="btn-primary">
+                                    ➕ Criar Primeira Propriedade
+                                </a>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    container.innerHTML = `
+                        <div class="properties-list">
+                            ${properties.map(property => `
+                                <div class="property-item">
+                                    <div class="property-info">
+                                        <div class="property-title">${property.title}</div>
+                                        <div class="property-meta">
+                                            <span>💰 ${property.price ? utils.formatPrice(property.price) : 'Preço não informado'}</span>
+                                            <span>📐 ${property.area ? utils.formatArea(property.area) : 'Área não informada'}</span>
+                                            <span>🛏️ ${property.bedrooms || 0} quartos</span>
+                                            <span>🚿 ${property.bathrooms || 0} banheiros</span>
+                                        </div>
+                                    </div>
+                                    <div class="property-status ${property.status}">
+                                        ${property.status === 'published' ? 'Publicado' : 'Rascunho'}
+                                    </div>
+                                    <div class="property-actions">
+                                        <a href="property-editor.html?id=${property.id}" class="btn-sm btn-outline">
+                                            ✏️ Editar
+                                        </a>
+                                        <a href="../client/tour.html?id=${property.id}" class="btn-sm btn-outline" target="_blank">
+                                            👁️ Ver Tour
+                                        </a>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar propriedades:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <h3>Erro ao carregar propriedades</h3>
+                        <p>Ocorreu um erro ao carregar suas propriedades. Tente novamente.</p>
+                        <button class="btn-primary" onclick="loadProperties()">
+                            🔄 Tentar Novamente
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Função global para logout
+        window.logout = async function() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                await authManager.signOut();
+            }
+        };
+
+        // Funções placeholder para ações rápidas
+        window.showUploadModal = function() {
+            alert('Funcionalidade de upload rápido será implementada em breve!');
+        };
+
+        window.showHotspotEditor = function() {
+            alert('Editor de hotspots será implementado em breve!');
+        };
+
+        window.showAnalytics = function() {
+            alert('Relatórios e analytics serão implementados em breve!');
+        };
+
+        // Expor função para recarregar propriedades
+        window.loadProperties = loadProperties;
+    </script>
+
+    <!-- Auth Guard Corrigido -->
+    <script type="module" src="auth-guard-fixed.js"></script>
+</body>
+</html>

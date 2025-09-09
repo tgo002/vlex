@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Tour Simples</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        #panorama { width: 100vw; height: 100vh; }
+        .info { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; z-index: 1000; }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h3>Teste Tour Simples</h3>
+        <p>Testando Pannellum com imagens 360° reais</p>
+    </div>
+    
+    <div id="panorama"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <script>
+        // Configuração simples usando as mesmas imagens do teste que funciona
+        const tourConfig = {
+            "default": {
+                "firstScene": "scene1",
+                "autoLoad": true,
+                "showControls": true,
+                "showFullscreenCtrl": true,
+                "showZoomCtrl": true
+            },
+            "scenes": {
+                "scene1": {
+                    "title": "Ambiente 1",
+                    "hfov": 110,
+                    "pitch": -3,
+                    "yaw": 117,
+                    "type": "equirectangular",
+                    "panorama": "./file-1755566234737-636002416.jpg",
+                    "hotSpots": [
+                        {
+                            "pitch": -2.1,
+                            "yaw": 132.9,
+                            "type": "info",
+                            "text": "Ponto de Interesse 1",
+                            "URL": "javascript:alert('Hotspot 1 clicado!')"
+                        },
+                        {
+                            "pitch": 14.1,
+                            "yaw": 1.5,
+                            "type": "info",
+                            "text": "Detalhes Arquitetônicos",
+                            "URL": "javascript:alert('Hotspot 2 clicado!')"
+                        },
+                        {
+                            "pitch": -0.9,
+                            "yaw": 222.6,
+                            "type": "scene",
+                            "text": "Ir para Ambiente 2",
+                            "sceneId": "scene2"
+                        }
+                    ]
+                },
+                "scene2": {
+                    "title": "Ambiente 2", 
+                    "hfov": 110,
+                    "pitch": -3,
+                    "yaw": 117,
+                    "type": "equirectangular",
+                    "panorama": "./file-1755614332574-909944521.JPG",
+                    "hotSpots": [
+                        {
+                            "pitch": 2.1,
+                            "yaw": -93.6,
+                            "type": "info",
+                            "text": "Características Especiais",
+                            "URL": "javascript:alert('Hotspot Ambiente 2!')"
+                        },
+                        {
+                            "pitch": -0.9,
+                            "yaw": 42.6,
+                            "type": "scene",
+                            "text": "Voltar para Ambiente 1",
+                            "sceneId": "scene1"
+                        }
+                    ]
+                }
+            }
+        };
+
+        // Inicializar o viewer
+        let viewer;
+        
+        function initViewer() {
+            try {
+                console.log('Inicializando viewer...');
+                viewer = pannellum.viewer('panorama', tourConfig);
+                
+                viewer.on('load', function() {
+                    console.log('✅ Cena carregada com sucesso:', viewer.getScene());
+                });
+                
+                viewer.on('error', function(error) {
+                    console.error('❌ Erro no viewer:', error);
+                });
+                
+                viewer.on('scenechange', function() {
+                    console.log('🔄 Mudança de cena para:', viewer.getScene());
+                });
+                
+                console.log('Viewer inicializado!');
+                
+            } catch (error) {
+                console.error('❌ Erro ao inicializar viewer:', error);
+            }
+        }
+
+        // Inicializar quando a página carregar
+        window.addEventListener('load', initViewer);
+    </script>
+</body>
+</html>

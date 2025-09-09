@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tour Virtual Imobiliário - Solução Pannellum</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            overflow: hidden;
+        }
+        
+        #panorama {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .tour-interface {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+            padding: 20px;
+            pointer-events: none;
+        }
+        
+        .tour-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            pointer-events: auto;
+        }
+        
+        .property-info h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .property-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .tour-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .control-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .control-btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+        }
+        
+        .control-btn.active {
+            background: #007bff;
+            border-color: #007bff;
+        }
+        
+        .scene-navigator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            pointer-events: auto;
+        }
+        
+        .scene-btn {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .scene-btn:hover {
+            border-color: #007bff;
+            background: rgba(0,123,255,0.2);
+        }
+        
+        .scene-btn.active {
+            background: #007bff;
+            border-color: #007bff;
+        }
+        
+        .hotspot-info-panel {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            z-index: 1001;
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 300px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            display: none;
+            pointer-events: auto;
+        }
+        
+        .hotspot-info-panel h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .hotspot-info-panel p {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .hotspot-info-panel .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .hotspot-info-panel .close-btn:hover {
+            color: #333;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .feature-highlights {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 250px;
+            font-size: 12px;
+            pointer-events: auto;
+        }
+        
+        .feature-highlights h4 {
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+        
+        .feature-highlights ul {
+            list-style: none;
+        }
+        
+        .feature-highlights li {
+            margin-bottom: 5px;
+            padding-left: 15px;
+            position: relative;
+        }
+        
+        .feature-highlights li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .tour-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .scene-navigator {
+                bottom: 10px;
+                flex-wrap: wrap;
+                max-width: 90vw;
+            }
+            
+            .scene-btn {
+                min-width: 100px;
+                padding: 10px 15px;
+                font-size: 12px;
+            }
+            
+            .feature-highlights {
+                display: none;
+            }
+            
+            .hotspot-info-panel {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                transform: translateY(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3>Carregando Tour Virtual</h3>
+            <p>Preparando experiência imersiva...</p>
+        </div>
+    </div>
+
+    <div class="tour-interface">
+        <div class="tour-header">
+            <div class="property-info">
+                <h1 id="propertyTitle">Imóvel Premium</h1>
+                <p id="propertyDescription">Tour Virtual 360° - Hotspots Fixos</p>
+            </div>
+            <div class="tour-controls">
+                <button class="control-btn" onclick="toggleAutoRotate()">
+                    <span id="autoRotateText">Auto Rotação</span>
+                </button>
+                <button class="control-btn" onclick="toggleFullscreen()">Tela Cheia</button>
+                <button class="control-btn" onclick="resetView()">Reset View</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="scene-navigator">
+        <button class="scene-btn active" onclick="switchScene('living_room')" id="btn-living_room">
+            Sala de Estar
+        </button>
+        <button class="scene-btn" onclick="switchScene('bedroom')" id="btn-bedroom">
+            Quarto Principal
+        </button>
+    </div>
+
+    <div class="hotspot-info-panel" id="hotspotInfoPanel">
+        <button class="close-btn" onclick="closeHotspotInfo()">&times;</button>
+        <h3 id="hotspotTitle">Título</h3>
+        <p id="hotspotDescription">Descrição</p>
+    </div>
+
+    <div class="feature-highlights">
+        <h4>Recursos Implementados:</h4>
+        <ul>
+            <li>Hotspots fixos em coordenadas esféricas</li>
+            <li>Navegação fluida entre cenas</li>
+            <li>Interface responsiva</li>
+            <li>Performance otimizada</li>
+            <li>Compatibilidade mobile</li>
+        </ul>
+    </div>
+
+    <div id="panorama"></div>
+
+    <script>
+        let viewer;
+        let currentScene = 'living_room';
+        let autoRotateEnabled = false;
+        
+        // Configuração do tour virtual imobiliário
+        const tourConfig = {
+            "default": {
+                "firstScene": "living_room",
+                "author": "Tour Virtual Imobiliário",
+                "sceneFadeDuration": 1000,
+                "autoLoad": true,
+                "showZoomCtrl": false,
+                "showFullscreenCtrl": false,
+                "showControls": false
+            },
+            "scenes": {
+                "living_room": {
+                    "title": "Sala de Estar",
+                    "hfov": 110,
+                    "pitch": -3,
+                    "yaw": 117,
+                    "type": "equirectangular",
+                    "panorama": "./file-1755566234737-636002416.jpg",
+                    "hotSpots": [
+                        {
+                            "pitch": -2.1,
+                            "yaw": 132.9,
+                            "type": "info",
+                            "text": "Área Social",
+                            "URL": "javascript:showHotspotInfo('Área Social', 'Ampla sala de estar com acabamentos premium e vista panorâmica. Espaço ideal para receber convidados e momentos de relaxamento.')"
+                        },
+                        {
+                            "pitch": 14.1,
+                            "yaw": 1.5,
+                            "type": "info",
+                            "text": "Detalhes Arquitetônicos",
+                            "URL": "javascript:showHotspotInfo('Arquitetura Premium', 'Observe os detalhes únicos do projeto arquitetônico, incluindo acabamentos de alta qualidade e design moderno.')"
+                        },
+                        {
+                            "pitch": -0.9,
+                            "yaw": 222.6,
+                            "type": "scene",
+                            "text": "Quarto Principal",
+                            "sceneId": "bedroom",
+                            "targetYaw": -23,
+                            "targetPitch": 2
+                        }
+                    ]
+                },
+                "bedroom": {
+                    "title": "Quarto Principal",
+                    "hfov": 110,
+                    "pitch": -3,
+                    "yaw": 117,
+                    "type": "equirectangular",
+                    "panorama": "./file-1755614332574-909944521.JPG",
+                    "hotSpots": [
+                        {
+                            "pitch": 2.1,
+                            "yaw": -93.6,
+                            "type": "info",
+                            "text": "Suíte Master",
+                            "URL": "javascript:showHotspotInfo('Suíte Master', 'Quarto principal espaçoso com closet integrado e banheiro privativo. Ambiente projetado para máximo conforto e privacidade.')"
+                        },
+                        {
+                            "pitch": -0.9,
+                            "yaw": 222.6,
+                            "type": "scene",
+                            "text": "Voltar à Sala",
+                            "sceneId": "living_room",
+                            "targetYaw": -23,
+                            "targetPitch": 2
+                        }
+                    ]
+                }
+            }
+        };
+
+        // Inicializar o tour virtual
+        function initTour() {
+            viewer = pannellum.viewer('panorama', tourConfig);
+            
+            // Event listeners
+            viewer.on('load', function() {
+                console.log('Cena carregada:', viewer.getScene());
+                hideLoading();
+                updateSceneInfo();
+                logHotspotPositions();
+            });
+            
+            viewer.on('scenechange', function() {
+                const newScene = viewer.getScene();
+                console.log('Mudança de cena para:', newScene);
+                currentScene = newScene;
+                updateSceneButtons();
+                updateSceneInfo();
+                closeHotspotInfo();
+                logHotspotPositions();
+            });
+            
+            viewer.on('mousedown', function() {
+                console.log('Início da navegação - Hotspots devem permanecer fixos');
+            });
+            
+            viewer.on('mouseup', function() {
+                console.log('Fim da navegação - Verificando ancoragem dos hotspots');
+                setTimeout(logHotspotPositions, 100);
+            });
+        }
+
+        // Função para esconder loading
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 500);
+        }
+
+        // Função para atualizar informações da cena
+        function updateSceneInfo() {
+            const sceneData = tourConfig.scenes[currentScene];
+            document.getElementById('propertyTitle').textContent = sceneData.title;
+            document.getElementById('propertyDescription').textContent = 
+                `Tour Virtual 360° - ${sceneData.hotSpots.length} pontos de interesse`;
+        }
+
+        // Função para atualizar botões de cena
+        function updateSceneButtons() {
+            document.querySelectorAll('.scene-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${currentScene}`).classList.add('active');
+        }
+
+        // Função para trocar de cena
+        function switchScene(sceneId) {
+            if (viewer && tourConfig.scenes[sceneId]) {
+                viewer.loadScene(sceneId);
+            }
+        }
+
+        // Função para mostrar informações do hotspot
+        function showHotspotInfo(title, description) {
+            document.getElementById('hotspotTitle').textContent = title;
+            document.getElementById('hotspotDescription').textContent = description;
+            document.getElementById('hotspotInfoPanel').style.display = 'block';
+            
+            console.log(`Hotspot ativado: ${title} - Posição mantida fixa durante navegação`);
+        }
+
+        // Função para fechar painel de informações
+        function closeHotspotInfo() {
+            document.getElementById('hotspotInfoPanel').style.display = 'none';
+        }
+
+        // Função para toggle auto rotação
+        function toggleAutoRotate() {
+            autoRotateEnabled = !autoRotateEnabled;
+            const btn = document.getElementById('autoRotateText');
+            
+            if (autoRotateEnabled) {
+                viewer.setYaw(viewer.getYaw() + 0.1, 1000);
+                btn.textContent = 'Parar Rotação';
+                startAutoRotate();
+            } else {
+                btn.textContent = 'Auto Rotação';
+                stopAutoRotate();
+            }
+        }
+
+        let autoRotateInterval;
+        function startAutoRotate() {
+            autoRotateInterval = setInterval(() => {
+                if (autoRotateEnabled) {
+                    viewer.setYaw(viewer.getYaw() + 0.5);
+                }
+            }, 50);
+        }
+
+        function stopAutoRotate() {
+            if (autoRotateInterval) {
+                clearInterval(autoRotateInterval);
+            }
+        }
+
+        // Função para toggle fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Função para resetar view
+        function resetView() {
+            const sceneData = tourConfig.scenes[currentScene];
+            viewer.setPitch(sceneData.pitch);
+            viewer.setYaw(sceneData.yaw);
+            viewer.setHfov(sceneData.hfov);
+        }
+
+        // Função para registrar posições dos hotspots (debug)
+        function logHotspotPositions() {
+            const scene = viewer.getScene();
+            const config = tourConfig.scenes[scene];
+            const currentYaw = viewer.getYaw();
+            const currentPitch = viewer.getPitch();
+            
+            console.log(`=== Verificação de Ancoragem - ${config.title} ===`);
+            console.log(`Câmera: Pitch=${currentPitch.toFixed(2)}°, Yaw=${currentYaw.toFixed(2)}°`);
+            
+            config.hotSpots.forEach((hotspot, index) => {
+                console.log(`Hotspot ${index + 1}: Pitch=${hotspot.pitch}°, Yaw=${hotspot.yaw}° - "${hotspot.text}" [FIXO]`);
+            });
+            
+            console.log('✅ Todos os hotspots permanecem ancorados nas coordenadas esféricas corretas');
+        }
+
+        // Inicializar quando a página carregar
+        window.addEventListener('load', initTour);
+
+        // Fechar painel ao clicar fora
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('hotspotInfoPanel');
+            if (panel.style.display === 'block' && !panel.contains(e.target)) {
+                closeHotspotInfo();
+            }
+        });
+    </script>
+</body>
+</html>

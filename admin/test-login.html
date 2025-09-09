@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login de Teste - Tours Virtuais 360°</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="email"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .admin-notice {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .admin-notice .icon {
+            font-size: 1.2rem;
+        }
+
+        .admin-notice p {
+            color: #666;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .test-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .test-info h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .test-info p {
+            color: #1565c0;
+            font-size: 0.85rem;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">🏠</div>
+        <h1>🔧 Login de Teste</h1>
+        <p class="subtitle">Sistema de Teste - Bypass Supabase</p>
+
+        <form id="testLoginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    placeholder="admin@tours360.com"
+                    value="admin@tours360.com"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    placeholder="Admin@Tours360!2024"
+                    value="Admin@Tours360!2024"
+                >
+            </div>
+
+            <button type="submit" class="btn">
+                Entrar (Teste)
+            </button>
+        </form>
+
+        <div class="test-info">
+            <h3>🧪 Modo de Teste</h3>
+            <p><strong>Email:</strong> admin@tours360.com</p>
+            <p><strong>Senha:</strong> Admin@Tours360!2024</p>
+            <p>Esta página bypassa o Supabase para testes</p>
+        </div>
+
+        <div class="admin-notice">
+            <span class="icon">🔐</span>
+            <p>Acesso de Teste - Funcionalidades Administrativas</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('testLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Simular validação
+            if (email === 'admin@tours360.com' && password === 'Admin@Tours360!2024') {
+                // Simular login bem-sucedido
+                localStorage.setItem('test_admin_logged_in', 'true');
+                localStorage.setItem('test_admin_email', email);
+                
+                // Redirecionar para dashboard
+                window.location.href = 'index.html';
+            } else {
+                alert('Credenciais incorretas!\n\nUse:\nEmail: admin@tours360.com\nSenha: Admin@Tours360!2024');
+            }
+        });
+
+        // Auto-focus no campo email
+        document.getElementById('email').focus();
+    </script>
+</body>
+</html>
