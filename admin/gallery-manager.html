@@ -378,7 +378,7 @@
     <header class="header">
         <div class="header-content">
             <div class="header-left">
-                <a href="index.html" class="back-btn">
+                <a href="/admin/index.html" class="back-btn">
                     ← Voltar ao Dashboard
                 </a>
                 <h1 class="page-title">Gerenciador de Galeria</h1>
@@ -469,8 +469,8 @@
     </main>
 
     <script type="module">
-        import { authManager, propertyManager, utils } from '../shared/supabase-client.js';
-        import './auth-guard-fixed.js';
+        import { authManager, propertyManager, utils } from '/shared/supabase-client.js';
+        import '/admin/auth-guard-fixed.js';
 
         let currentUser = null;
         let currentProperty = null;
@@ -485,7 +485,7 @@
                     currentUser = { email: localStorage.getItem('test_admin_email') || 'admin@tours360.com' };
                 }
                 if (!currentUser) {
-                    window.location.href = 'login-fixed.html';
+                    window.location.href = '/admin/login-fixed.html';
                     return;
                 }
 

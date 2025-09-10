@@ -2,6 +2,15 @@
   "version": 2,
   "cleanUrls": true,
   "trailingSlash": true,
+  "rewrites": [
+    { "source": "/admin/login-fixed/", "destination": "/admin/login-fixed.html" },
+    { "source": "/admin/property-editor/", "destination": "/admin/property-editor.html" },
+    { "source": "/admin/scene-manager/", "destination": "/admin/scene-manager.html" },
+    { "source": "/admin/gallery-manager/", "destination": "/admin/gallery-manager.html" },
+    { "source": "/client/tour/", "destination": "/client/tour.html" },
+    { "source": "/admin/", "destination": "/admin/index.html" }
+  ],
+
   "headers": [
     {
       "source": "/(.*)",

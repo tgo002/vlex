@@ -403,9 +403,9 @@
     </div>
 
     <script type="module">
-        import { authManager, propertyManager, sceneManager, utils } from '../shared/supabase-client.js';
-        import { ImageUploader } from '../shared/image-uploader.js';
-        import './auth-guard-fixed.js';
+        import { authManager, propertyManager, sceneManager, utils } from '/shared/supabase-client.js';
+        import { ImageUploader } from '/shared/image-uploader.js';
+        import '/admin/auth-guard-fixed.js';
 
         let currentUser = null;
         let currentProperty = null;
@@ -422,7 +422,7 @@
                 return;
             }
             if (!session) {
-                window.location.href = 'login-fixed.html';
+                window.location.href = '/admin/login-fixed.html';
                 return;
             }
 
@@ -443,7 +443,7 @@
             }
 
             // Configurar botão voltar
-            document.getElementById('backBtn').href = `property-editor.html?id=${propertyId}`;
+            document.getElementById('backBtn').href = `/admin/property-editor.html?id=${propertyId}`;
 
             // Carregar propriedade
             await loadProperty();
@@ -666,12 +666,12 @@
 
         // Preview da cena
         window.previewScene = function(sceneId) {
-            window.open(`../client/tour.html?id=${propertyId}&scene=${sceneId}`, '_blank');
+            window.open(`/client/tour.html?id=${propertyId}&scene=${sceneId}`, '_blank');
         };
 
         // Adicionar hotspots
         window.addHotspots = function() {
-            window.location.href = `hotspot-editor.html?propertyId=${propertyId}`;
+            window.location.href = `/admin/hotspot-editor.html?propertyId=${propertyId}`;
         };
 
         // Função para mostrar alerta
