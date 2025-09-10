@@ -855,7 +855,8 @@
                     if (!input) return input;
                     const u = new URL(input, window.location.origin);
                     if (u.hostname === 'localhost' || u.hostname === '127.0.0.1') {
-                        return u.pathname.startsWith('/') ? u.pathname : '/' + u.pathname;
+                        // Fallback de demonstração: imagens locais não existem no Vercel
+                        return 'https://pannellum.org/images/alma.jpg';
                     }
                     // Se for mesma origem, preferir caminho relativo (mais portátil)
                     if (u.origin === window.location.origin) {
