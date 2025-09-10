@@ -407,6 +407,27 @@
         import { ImageUploader } from '/shared/image-uploader.js';
         import '/admin/auth-guard-fixed.js';
 
+        // Normaliza URLs de cenas para evitar localhost/mixed content no Vercel
+        function resolveImageUrl(input) {
+            try {
+                if (!input) return input;
+                const u = new URL(input, window.location.origin);
+                if (u.hostname === 'localhost' || u.hostname === '127.0.0.1') {
+                    return 'https://pannellum.org/images/alma.jpg';
+                }
+                if (u.origin === window.location.origin && u.pathname.startsWith('/file-')) {
+                    return 'https://pannellum.org/images/alma.jpg';
+                }
+                return u.href;
+            } catch (e) {
+                if (typeof input === 'string') {
+                    if (input.startsWith('./')) return input.slice(1);
+                    if (!input.startsWith('/')) return '/' + input;
+                }
+                return input;
+            }
+        }
+
         let currentUser = null;
         let currentProperty = null;
         let propertyId = null;
@@ -589,7 +610,7 @@
             return `
                 <div class="scene-card ${scene.is_default ? 'default' : ''}" data-scene-id="${scene.id}">
                     <div class="scene-preview">
-                        <img src="${scene.image_url}" alt="${scene.title}" loading="lazy">
+                        <img src="${resolveImageUrl(scene.image_url)}" alt="${scene.title}" loading="lazy">
                         ${scene.is_default ? '<div class="scene-badge">Padrão</div>' : ''}
                     </div>
                     <div class="scene-info">
