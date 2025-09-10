@@ -858,8 +858,12 @@
                         // Fallback de demonstração: imagens locais não existem no Vercel
                         return 'https://pannellum.org/images/alma.jpg';
                     }
-                    // Se for mesma origem, preferir caminho relativo (mais portátil)
+                    // Se for mesma origem
                     if (u.origin === window.location.origin) {
+                        // Arquivos locais como /file-*.jpg n e3o existem no Vercel: usar imagem demo
+                        if (u.pathname.startsWith('/file-')) {
+                            return 'https://pannellum.org/images/alma.jpg';
+                        }
                         return u.pathname + u.search;
                     }
                     return u.href;
