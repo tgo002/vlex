@@ -1032,16 +1032,16 @@
     <!-- Header -->
     <header class="header" id="header">
         <nav class="nav-container">
-            <a href="index.html" class="logo">
+            <a href="/index.html" class="logo">
                 <i class="fas fa-chart-line"></i>
                 ValorExpert
             </a>
             <ul class="nav-menu">
-                <li><a href="index.html#properties">Propriedades</a></li>
-                <li><a href="index.html#about">Sobre</a></li>
-                <li><a href="index.html#contact">Contato</a></li>
+                <li><a href="/index.html#properties">Propriedades</a></li>
+                <li><a href="/index.html#about">Sobre</a></li>
+                <li><a href="/index.html#contact">Contato</a></li>
             </ul>
-            <a href="index.html" class="back-btn">
+            <a href="/index.html" class="back-btn">
                 <i class="fas fa-arrow-left"></i>
                 Voltar
             </a>
@@ -1060,7 +1060,7 @@
         <div class="error" id="error" style="display: none;">
             <h2>Propriedade não encontrada</h2>
             <p>A propriedade solicitada não foi encontrada ou não está disponível.</p>
-            <a href="index.html" class="gallery-btn">Voltar à página inicial</a>
+            <a href="/index.html" class="gallery-btn">Voltar à página inicial</a>
         </div>
 
         <!-- Property Content -->
@@ -1069,7 +1069,7 @@
             <section class="property-hero-modern">
                 <div class="hero-gallery">
                     <div class="main-image-container">
-                        <img id="mainImage" src="https://via.placeholder.com/1200x600?text=Carregando..." alt="Imagem principal" class="main-image">
+                        <img id="mainImage" src="https://placehold.co/1200x600?text=Carregando..." alt="Imagem principal" class="main-image">
 
                         <!-- Overlay com Informações da Propriedade -->
                         <div class="property-overlay">
@@ -1263,7 +1263,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <a href="index.html" class="logo">
+                    <a href="/index.html" class="logo">
                         <i class="fas fa-chart-line"></i>
                         ValorExpert
                     </a>
@@ -1273,9 +1273,9 @@
                 <div class="footer-links">
                     <div class="footer-column">
                         <h4>Navegação</h4>
-                        <a href="index.html#properties">Propriedades</a>
-                        <a href="index.html#about">Sobre</a>
-                        <a href="index.html#contact">Contato</a>
+                        <a href="/index.html#properties">Propriedades</a>
+                        <a href="/index.html#about">Sobre</a>
+                        <a href="/index.html#contact">Contato</a>
                     </div>
                     <div class="footer-column">
                         <h4>Suporte</h4>
@@ -1303,11 +1303,33 @@
     </footer>
 
     <script type="module">
-        import { utils } from './shared/supabase-client.js';
+        import { utils } from '/shared/supabase-client.js';
 
         let currentProperty = null;
         let galleryImages = [];
         let currentImageIndex = 0;
+
+        // Normaliza URLs de imagem para evitar localhost/mixed content e placeholders sem host
+        function resolveImageUrl(input) {
+            try {
+                if (!input) return input;
+                const u = new URL(input, window.location.origin);
+                if (u.hostname === 'localhost' || u.hostname === '127.0.0.1') {
+                    return 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80';
+                }
+                if (u.origin === window.location.origin && u.pathname.startsWith('/file-')) {
+                    return 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80';
+                }
+                return u.href;
+            } catch (e) {
+                if (typeof input === 'string') {
+                    if (/^\d+x\d+\?text=/.test(input)) return 'https://placehold.co/' + input;
+                    if (input.startsWith('./')) return input.slice(1);
+                    if (!input.startsWith('/')) return '/' + input;
+                }
+                return input;
+            }
+        }
 
         // Obter ID da propriedade da URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -1323,7 +1345,7 @@
         async function loadProperty() {
             try {
                 // Import supabase client
-                const { supabase } = await import('./shared/supabase-client.js');
+                const { supabase } = await import('/shared/supabase-client.js');
 
                 // Carregar dados da propriedade
                 const { data: property, error: propertyError } = await supabase
@@ -1488,20 +1510,21 @@
 
             if (galleryImages.length === 0) {
                 // Usar imagem padrão se não houver galeria
-                mainImage.src = currentProperty?.main_image_url || 'https://via.placeholder.com/800x600?text=Sem+Imagem';
+                mainImage.src = resolveImageUrl(currentProperty?.main_image_url) || 'https://placehold.co/800x600?text=Sem+Imagem';
                 thumbnailGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666;">Nenhuma imagem disponível</p>';
                 return;
             }
 
             // Imagem principal
-            mainImage.src = galleryImages[currentImageIndex].image_url;
+            mainImage.src = resolveImageUrl(galleryImages[currentImageIndex].image_url);
 
             // Thumbnails
             thumbnailGrid.innerHTML = '';
             galleryImages.slice(0, 4).forEach((image, index) => {
                 const thumbnail = document.createElement('div');
                 thumbnail.className = `thumbnail ${index === currentImageIndex ? 'active' : ''}`;
-                thumbnail.innerHTML = `<img src="${image.image_url}" alt="${image.title || 'Imagem'}" />`;
+                const imgSrc = resolveImageUrl(image.image_url);
+                thumbnail.innerHTML = `<img src="${imgSrc}" alt="${image.title || 'Imagem'}" />`;
                 thumbnail.onclick = () => setCurrentImage(index);
                 thumbnailGrid.appendChild(thumbnail);
             });
@@ -1530,7 +1553,7 @@
 
         // Iniciar tour 360°
         window.startTour = function() {
-            const tourUrl = `client/tour.html?id=${propertyId}`;
+            const tourUrl = `/client/tour.html?id=${propertyId}`;
             window.location.href = tourUrl;
         };
 

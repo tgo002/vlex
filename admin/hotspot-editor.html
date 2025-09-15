@@ -13,11 +13,16 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f8f9fa;
             color: #333;
-            overflow: hidden;
+            /* Permitir rolagem vertical para acessar botões no painel direito */
+            overflow: auto !important;
+            overflow-y: auto !important;
         }
 
         .editor-container {
@@ -104,6 +109,9 @@
             display: flex;
             flex-direction: column;
             border-left: 1px solid #dee2e6;
+            /* Garantir rolagem própria do painel em telas menores */
+            max-height: 100vh;
+            overflow-y: auto;
         }
 
         .panel-header {
@@ -377,6 +385,10 @@
             padding: 20px;
             border-top: 1px solid #e9ecef;
             background: #f8f9fa;
+            /* Fixa o rodapé ao final do painel para acesso fácil */
+            position: sticky;
+            bottom: 0;
+            z-index: 5;
         }
 
         .alert {
@@ -693,8 +705,30 @@
     </div>
 
     <script type="module">
-        import { authManager, propertyManager, sceneManager, hotspotManager, utils } from '../shared/supabase-client.js';
-        import './auth-guard-fixed.js';
+        import { authManager, propertyManager, sceneManager, hotspotManager, utils } from '/shared/supabase-client.js';
+        import '/admin/auth-guard-fixed.js';
+
+        // Normaliza URLs de imagem para evitar localhost/mixed content no Vercel
+        function resolveImageUrl(input) {
+            try {
+                if (!input) return input;
+                const u = new URL(input, window.location.origin);
+                if (u.hostname === 'localhost' || u.hostname === '127.0.0.1') {
+                    return 'https://pannellum.org/images/alma.jpg';
+                }
+                if (u.origin === window.location.origin && u.pathname.startsWith('/file-')) {
+                    return 'https://pannellum.org/images/alma.jpg';
+                }
+                return u.href;
+            } catch (e) {
+                if (typeof input === 'string') {
+                    if (/^\d+x\d+\?text=/.test(input)) return 'https://via.placeholder.com/' + input;
+                    if (input.startsWith('./')) return input.slice(1);
+                    if (!input.startsWith('/')) return '/' + input;
+                }
+                return input;
+            }
+        }
 
         let currentUser = null;
         let propertyId = null;
@@ -825,7 +859,7 @@
 
             const config = {
                 type: 'equirectangular',
-                panorama: currentScene.image_url,
+                panorama: resolveImageUrl(currentScene.image_url),
                 autoLoad: true,
                 pitch: currentScene.initial_pitch || 0,
                 yaw: currentScene.initial_yaw || 0,
@@ -1295,17 +1329,17 @@
 
         // Voltar
         window.goBack = function() {
-            window.location.href = `scene-manager.html?propertyId=${propertyId}`;
+            window.location.href = `/admin/scene-manager.html?propertyId=${propertyId}`;
         };
 
         // Salvar e preview
         window.saveAndPreview = function() {
-            window.open(`../client/tour.html?id=${propertyId}`, '_blank');
+            window.open(`/client/tour.html?id=${propertyId}`, '_blank');
         };
 
         // Salvar e sair
         window.saveAndExit = function() {
-            window.location.href = `property-editor.html?id=${propertyId}`;
+            window.location.href = `/admin/property-editor.html?id=${propertyId}`;
         };
 
         // Função para mostrar alerta

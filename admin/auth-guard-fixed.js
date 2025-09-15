@@ -54,15 +54,18 @@ class SimpleAuthGuard {
         }
 
         try {
-            // Verificar modo de teste PRIMEIRO (mais confiável)
-            const testLogin = localStorage.getItem('test_admin_logged_in');
-            this.log(`Modo de teste: ${testLogin}`);
-            
-            if (testLogin === 'true') {
-                this.log('✅ Autenticação de teste válida');
+            // Verificar modo de teste (somente ambiente local)
+            const testLogin = localStorage.getItem('test_admin_logged_in') === 'true';
+            const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+            this.log(`Modo de teste: ${testLogin} | isLocal: ${isLocal}`);
+
+            if (testLogin && isLocal) {
+                this.log('✅ Autenticação de teste válida (ambiente local)');
                 this.showTestUserIndicator();
                 this.isInitialized = true;
                 return true;
+            } else if (testLogin && !isLocal) {
+                this.log('⚠️ Modo de teste desativado em produção');
             }
 
             // Verificar token do Supabase como fallback
