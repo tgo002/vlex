@@ -1178,11 +1178,11 @@
                                 <i class="fab fa-whatsapp"></i>
                             </div>
                             <div class="action-content">
-                                <h3>WhatsApp</h3>
-                                <p>Fale conosco agora mesmo</p>
-                                <a href="https://wa.me/5511999999999?text=Olá! Tenho interesse na propriedade" class="action-btn">
+                                <h3>Tenho Interesse</h3>
+                                <p>Quero mais informações sobre este imóvel</p>
+                                <a href="#" id="whatsappInterest" class="action-btn">
                                     <i class="fab fa-whatsapp"></i>
-                                    Chamar no WhatsApp
+                                    Demonstrar Interesse
                                 </a>
                             </div>
                         </div>
@@ -1193,25 +1193,25 @@
                             </div>
                             <div class="action-content">
                                 <h3>Agendar Visita</h3>
-                                <p>Visite pessoalmente</p>
-                                <button class="action-btn" onclick="scheduleVisit()">
-                                    <i class="fas fa-calendar-check"></i>
-                                    Agendar Visita
-                                </button>
+                                <p>Visite pessoalmente ou virtualmente</p>
+                                <a href="#" id="whatsappVisit" class="action-btn">
+                                    <i class="fab fa-whatsapp"></i>
+                                    Agendar pelo WhatsApp
+                                </a>
                             </div>
                         </div>
 
                         <div class="action-card">
                             <div class="action-icon">
-                                <i class="fas fa-envelope"></i>
+                                <i class="fas fa-calculator"></i>
                             </div>
                             <div class="action-content">
-                                <h3>Email</h3>
-                                <p>Receba mais informações</p>
-                                <button class="action-btn" onclick="sendEmail()">
-                                    <i class="fas fa-envelope"></i>
-                                    Enviar Email
-                                </button>
+                                <h3>Financiamento</h3>
+                                <p>Simule financiamento e condições</p>
+                                <a href="#" id="whatsappFinancing" class="action-btn">
+                                    <i class="fab fa-whatsapp"></i>
+                                    Simular Financiamento
+                                </a>
                             </div>
                         </div>
 
@@ -1222,9 +1222,9 @@
                             <div class="action-content">
                                 <h3>Telefone</h3>
                                 <p>Ligue para nós</p>
-                                <a href="tel:+5511999999999" class="action-btn">
+                                <a href="#" id="phoneContact" class="action-btn">
                                     <i class="fas fa-phone"></i>
-                                    (11) 99999-9999
+                                    <span id="phoneNumber">(11) 99999-9999</span>
                                 </a>
                             </div>
                         </div>
@@ -1348,12 +1348,22 @@
                 const { supabase } = await import('/shared/supabase-client.js');
 
                 // Carregar dados da propriedade
-                const { data: property, error: propertyError } = await supabase
+                // Tenta carregar como publicado; se não existir (406), faz fallback para qualquer status (preview/admin)
+                let { data: property, error: propertyError, status: httpStatus } = await supabase
                     .from('properties')
                     .select('*')
                     .eq('id', propertyId)
                     .eq('status', 'published')
-                    .single();
+                    .maybeSingle();
+                if (!property) {
+                    const res2 = await supabase
+                        .from('properties')
+                        .select('*')
+                        .eq('id', propertyId)
+                        .single();
+                    property = res2.data;
+                    propertyError = res2.error;
+                }
 
                 if (propertyError || !property) {
                     showError();
@@ -1604,6 +1614,85 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('propertyContent').style.display = 'block';
         }
+
+        // Inicializar WhatsApp
+        async function initWhatsApp() {
+            try {
+                // Import supabase client
+                const { supabase } = await import('/shared/supabase-client.js');
+
+                // Buscar configurações do Supabase
+                const { data: settings, error } = await supabase
+                    .from('site_settings')
+                    .select('*')
+                    .in('setting_key', ['whatsapp_number', 'phone_number']);
+
+                if (error) {
+                    console.warn('Erro ao carregar configurações WhatsApp:', error);
+                    return;
+                }
+
+                // Converter array para objeto
+                const config = {};
+                settings.forEach(setting => {
+                    config[setting.setting_key] = setting.setting_value;
+                });
+
+                const whatsappNumber = config.whatsapp_number || '5511999999999';
+                const phoneNumber = config.phone_number || '+55 (11) 9999-9999';
+
+                // Atualizar número de telefone na interface
+                const phoneElement = document.getElementById('phoneNumber');
+                if (phoneElement) {
+                    phoneElement.textContent = phoneNumber;
+                }
+
+                // Configurar link de telefone
+                const phoneContact = document.getElementById('phoneContact');
+                if (phoneContact) {
+                    phoneContact.href = `tel:${phoneNumber.replace(/\D/g, '')}`;
+                }
+
+                // Configurar botões WhatsApp
+                const propertyTitle = currentProperty ? currentProperty.title : 'este imóvel';
+                const propertyPrice = currentProperty ? `R$ ${Number(currentProperty.price).toLocaleString('pt-BR')}` : '';
+
+                const whatsappButtons = {
+                    whatsappInterest: {
+                        message: `Olá! Tenho interesse no imóvel "${propertyTitle}" ${propertyPrice ? `(${propertyPrice})` : ''}. Gostaria de mais informações.`
+                    },
+                    whatsappVisit: {
+                        message: `Olá! Gostaria de agendar uma visita ao imóvel "${propertyTitle}" ${propertyPrice ? `(${propertyPrice})` : ''}. Quando seria possível?`
+                    },
+                    whatsappFinancing: {
+                        message: `Olá! Tenho interesse no imóvel "${propertyTitle}" ${propertyPrice ? `(${propertyPrice})` : ''} e gostaria de simular financiamento. Podem me ajudar?`
+                    }
+                };
+
+                // Adicionar event listeners
+                Object.keys(whatsappButtons).forEach(buttonId => {
+                    const button = document.getElementById(buttonId);
+                    if (button) {
+                        const message = encodeURIComponent(whatsappButtons[buttonId].message);
+                        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+
+                        button.href = whatsappUrl;
+                        button.target = '_blank';
+                        button.rel = 'noopener noreferrer';
+                    }
+                });
+
+            } catch (error) {
+                console.error('Erro ao inicializar WhatsApp:', error);
+            }
+        }
+
+        // Chamar initWhatsApp após carregar a propriedade
+        const originalDisplayProperty = displayProperty;
+        displayProperty = function() {
+            originalDisplayProperty();
+            initWhatsApp();
+        };
     </script>
 </body>
 </html>

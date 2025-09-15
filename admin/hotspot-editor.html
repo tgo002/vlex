@@ -487,32 +487,7 @@
             cursor: grabbing !important;
         }
 
-        .pnlm-hotspot-base.hotspot-highlight {
-            background: #ffc107 !important;
-            border: 3px solid white !important;
-            border-radius: 20% !important;
-            width: 22px !important;
-            height: 22px !important;
-            cursor: grab !important;
-            position: relative !important;
-        }
 
-        .pnlm-hotspot-base.hotspot-highlight:hover {
-            background: #e0a800 !important;
-            transform: scale(1.2) !important;
-            cursor: grabbing !important;
-        }
-
-        .pnlm-hotspot-base.hotspot-highlight::after {
-            content: '⭐';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12px;
-            color: white;
-            pointer-events: none;
-        }
 
         /* Animação de pulse para hotspots */
         .pnlm-hotspot-base {
@@ -535,15 +510,7 @@
             100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
         }
 
-        .pnlm-hotspot-base.hotspot-highlight {
-            animation: hotspot-pulse-yellow 2s infinite;
-        }
 
-        @keyframes hotspot-pulse-yellow {
-            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
-        }
 
         @media (max-width: 768px) {
             .editor-container {
@@ -569,7 +536,7 @@
         <!-- Visualizador 360° -->
         <div class="viewer-section">
             <div id="panorama"></div>
-            
+
             <div class="viewer-overlay">
                 <button class="overlay-btn" id="addModeBtn" onclick="toggleAddMode()">
                     📍 Adicionar Hotspot
@@ -581,7 +548,7 @@
                     👁️ Preview
                 </button>
             </div>
-            
+
             <div class="crosshair" id="crosshair"></div>
         </div>
 
@@ -629,26 +596,22 @@
                             <div class="hotspot-type-icon">🚪</div>
                             <div class="hotspot-type-name">Navegação</div>
                         </div>
-                        <div class="hotspot-type" data-type="highlight">
-                            <div class="hotspot-type-icon">⭐</div>
-                            <div class="hotspot-type-name">Destaque</div>
-                        </div>
                     </div>
                 </div>
 
                 <!-- Formulário do Hotspot -->
                 <div class="panel-section">
                     <h3>✏️ Configurar Hotspot</h3>
-                    
+
                     <div class="coordinates-display">
                         <div class="form-group">
                             <label>Pitch (Vertical)</label>
-                            <input type="number" id="hotspotPitch" class="coordinate-input" 
+                            <input type="number" id="hotspotPitch" class="coordinate-input"
                                    step="0.1" min="-90" max="90" readonly>
                         </div>
                         <div class="form-group">
                             <label>Yaw (Horizontal)</label>
-                            <input type="number" id="hotspotYaw" class="coordinate-input" 
+                            <input type="number" id="hotspotYaw" class="coordinate-input"
                                    step="0.1" min="0" max="360" readonly>
                         </div>
                     </div>
@@ -660,7 +623,7 @@
 
                     <div class="form-group">
                         <label for="hotspotDescription">Descrição</label>
-                        <textarea id="hotspotDescription" 
+                        <textarea id="hotspotDescription"
                                   placeholder="Descreva este ponto de interesse..."></textarea>
                     </div>
 
@@ -744,6 +707,12 @@
         let draggedHotspot = null;
         let dragStartCoords = null;
 
+        // Expor variáveis no escopo global para debug
+        window.scenes = scenes;
+        window.currentScene = currentScene;
+        window.viewer = viewer;
+        window.isAddMode = isAddMode;
+
         // Verificar autenticação
         authManager.onAuthChange((event, session) => {
             const testLogin = localStorage.getItem('test_admin_logged_in') === 'true';
@@ -766,16 +735,16 @@
             // Obter ID da propriedade da URL
             const urlParams = new URLSearchParams(window.location.search);
             propertyId = urlParams.get('propertyId');
-            
+
             if (!propertyId) {
                 showAlert('ID da propriedade não encontrado.', 'error');
                 setTimeout(() => window.location.href = 'index.html', 2000);
                 return;
             }
 
-            // Carregar dados
-            await loadProperty();
-            await loadScenes();
+            // Carregar dados (garantir listeners mesmo com falhas)
+            try { await loadProperty(); } catch (e) { console.error('Erro ao carregar propriedade:', e); }
+            try { await loadScenes(); } catch (e) { console.error('Erro ao carregar cenas:', e); }
             setupEventListeners();
         }
 
@@ -783,7 +752,7 @@
         async function loadProperty() {
             try {
                 const result = await propertyManager.getProperty(propertyId);
-                
+
                 if (result.success) {
                     currentProperty = result.data;
                 } else {
@@ -799,11 +768,12 @@
         async function loadScenes() {
             try {
                 const result = await sceneManager.getScenes(propertyId);
-                
+
                 if (result.success) {
                     scenes = result.data || [];
+                    window.scenes = scenes; // Atualizar variável global
                     populateSceneSelector();
-                    
+
                     if (scenes.length > 0) {
                         // Selecionar primeira cena ou cena padrão
                         const defaultScene = scenes.find(s => s.is_default) || scenes[0];
@@ -825,13 +795,13 @@
         function populateSceneSelector() {
             const sceneSelect = document.getElementById('sceneSelect');
             const targetScene = document.getElementById('targetScene');
-            
-            sceneSelect.innerHTML = scenes.map(scene => 
+
+            sceneSelect.innerHTML = scenes.map(scene =>
                 `<option value="${scene.id}">${scene.title}</option>`
             ).join('');
 
-            targetScene.innerHTML = '<option value="">Selecione uma cena</option>' + 
-                scenes.map(scene => 
+            targetScene.innerHTML = '<option value="">Selecione uma cena</option>' +
+                scenes.map(scene =>
                     `<option value="${scene.id}">${scene.title}</option>`
                 ).join('');
         }
@@ -841,12 +811,19 @@
             const sceneId = document.getElementById('sceneSelect').value;
             if (!sceneId) return;
 
+                console.log('[HS] changeScene(): sceneId=', sceneId, 'scenes=', scenes?.length);
+
+
             currentScene = scenes.find(s => s.id === sceneId);
+            window.currentScene = currentScene; // Atualizar variável global
             if (!currentScene) return;
+
+
+                console.log('[HS] changeScene(): currentScene=', currentScene?.title || currentScene?.id);
 
             // Carregar cena no viewer
             loadSceneInViewer();
-            
+
             // Carregar hotspots da cena
             await loadHotspots();
         };
@@ -869,18 +846,37 @@
             };
 
             viewer = pannellum.viewer('panorama', config);
-            
+            window.viewer = viewer; // Atualizar variável global
+
             viewer.on('load', () => {
                 console.log('Cena carregada:', currentScene.title);
                 updateHotspotsInViewer();
             });
 
-            // Adicionar event listener para cliques (modo adicionar)
+            // Adicionar event listener para cliques (modo adicionar) usando evento DOM para obter MouseEvent real
+            // Vincula no container interno do Pannellum (preferencial) para garantir o MouseEvent correto
+            const panoInner = document.querySelector('#panorama .pnlm-container');
+            const panoEl = panoInner || document.getElementById('panorama');
+            // Usa capture=true para interceptar antes do Pannellum consumir o evento
+            panoEl.addEventListener('mousedown', handleViewerClick, true);
+            panoEl.addEventListener('mouseup', handleViewerClick, true);
+
+            // Listener interno do Pannellum (backup)
             viewer.on('mousedown', handleViewerClick);
+            viewer.on('mouseup', handleViewerClick);
 
             // Event listener para movimento do mouse (drag)
             viewer.on('mousemove', handleViewerMouseMove);
+
+                console.log('[HS] loadSceneInViewer(): listeners bound', {
+                    hasInner: !!document.querySelector('#panorama .pnlm-container'),
+                    hasMouseEventToCoords: typeof viewer?.mouseEventToCoords === 'function'
+                });
+
         }
+
+        // Expor função no escopo global para debug
+        window.loadSceneInViewer = loadSceneInViewer;
 
         // Carregar hotspots da cena
         async function loadHotspots() {
@@ -888,7 +884,7 @@
 
             try {
                 const result = await hotspotManager.getHotspots(currentScene.id);
-                
+
                 if (result.success) {
                     hotspots = result.data || [];
                     updateHotspotsList();
@@ -947,7 +943,7 @@
         // Atualizar lista de hotspots
         function updateHotspotsList() {
             const container = document.getElementById('hotspotsList');
-            
+
             if (hotspots.length === 0) {
                 container.innerHTML = `
                     <p style="text-align: center; color: #6c757d; padding: 20px;">
@@ -978,34 +974,72 @@
         function getHotspotIcon(type) {
             const icons = {
                 info: 'ℹ️',
-                navigation: '🚪',
-                highlight: '⭐'
+                navigation: '🚪'
             };
             return icons[type] || 'ℹ️';
         }
 
+        // Atualiza a habilitao do bot e3o Salvar conforme os campos obrigat f3rios
+        function updateSaveButtonState() {
+            const title = (document.getElementById('hotspotTitle')?.value || '').trim();
+            const pitch = parseFloat(document.getElementById('hotspotPitch')?.value || '');
+            const yaw = parseFloat(document.getElementById('hotspotYaw')?.value || '');
+            const hasCoords = !isNaN(pitch) && !isNaN(yaw);
+            let ok = hasCoords && title.length > 0;
+
+            console.log('[HS] updateSaveButtonState input', { titleLen: title.length, pitch, yaw, selectedHotspotType, targetScene: document.getElementById('targetScene')?.value });
+
+            if (selectedHotspotType === 'navigation') {
+                ok = ok && !!(document.getElementById('targetScene')?.value);
+            }
+            const btn = document.getElementById('saveHotspotBtn');
+            if (btn) btn.disabled = !ok;
+
+            console.log('[HS] saveHotspotBtn.disabled =', btn?.disabled);
+
+        }
+
         // Configurar event listeners
         function setupEventListeners() {
+
+            console.log('[HS] setupEventListeners(): binding form/type listeners');
+
             // Tipos de hotspot
             document.querySelectorAll('.hotspot-type').forEach(type => {
                 type.addEventListener('click', () => {
                     document.querySelectorAll('.hotspot-type').forEach(t => t.classList.remove('selected'));
                     type.classList.add('selected');
                     selectedHotspotType = type.dataset.type;
-                    
+
                     // Mostrar/ocultar campo de cena de destino
                     const targetSceneGroup = document.getElementById('targetSceneGroup');
                     targetSceneGroup.style.display = selectedHotspotType === 'navigation' ? 'block' : 'none';
+
+                    console.log('[HS] hotspot-type click', { selectedHotspotType });
+                    updateSaveButtonState();
                 });
             });
+
+            // Inputs que influenciam a valida E7 e3o
+            ['hotspotTitle','hotspotDescription','hotspotPitch','hotspotYaw','hotspotColor','targetScene']
+                .forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.addEventListener('input', updateSaveButtonState);
+                });
+
+            updateSaveButtonState();
         }
 
         // Toggle modo adicionar
-        window.toggleAddMode = function() {
+        window.toggleAddMode = function(keepCoordinates = false) {
             isAddMode = !isAddMode;
+            window.isAddMode = isAddMode; // Atualizar variável global
+
+            console.log('[HS] toggleAddMode()', { isAddMode, selectedHotspotType, keepCoordinates });
+
             const btn = document.getElementById('addModeBtn');
             const crosshair = document.getElementById('crosshair');
-            
+
             if (isAddMode) {
                 btn.classList.add('active');
                 btn.textContent = '❌ Cancelar Adição';
@@ -1015,12 +1049,26 @@
                 btn.classList.remove('active');
                 btn.textContent = '📍 Adicionar Hotspot';
                 crosshair.style.display = 'none';
-                clearHotspotForm();
+
+                // Só limpar o formulário se não for para manter as coordenadas
+                if (!keepCoordinates) {
+                    clearHotspotForm();
+                } else {
+                    showAlert('Coordenadas definidas! Preencha as informações do hotspot.', 'success');
+                }
             }
         };
 
         // Handle clique no viewer
         function handleViewerClick(event) {
+
+            console.log('[HS] handleViewerClick start', {
+                type: event?.type,
+                isAddMode,
+                targetTag: event?.target?.tagName,
+                targetClasses: event?.target?.className
+            });
+
             // Verificar se clicou em um hotspot existente
             const clickedElement = event.target;
             const hotspotElement = clickedElement.closest('.pnlm-hotspot-base');
@@ -1036,25 +1084,38 @@
                 }
             }
 
-            if (!isAddMode) return;
+            if (!isAddMode) { console.log('[HS] handleViewerClick: ignored (isAddMode=false)'); return; }
 
-            // Obter coordenadas do clique
-            const pitch = viewer.getPitch();
-            const yaw = viewer.getYaw();
-
-            // Converter radianos para graus
-            const pitchDeg = pitch * 180 / Math.PI;
-            const yawDeg = ((yaw * 180 / Math.PI) + 360) % 360;
+            // Calcular coordenadas no local clicado (Pannellum retorna graus)
+            let pitchDeg, yawDeg;
+            if (viewer && typeof viewer.mouseEventToCoords === 'function') {
+                const coords = viewer.mouseEventToCoords(event);
+                if (Array.isArray(coords)) {
+                    pitchDeg = coords[0];
+                    yawDeg = ((coords[1] % 360) + 360) % 360;
+                }
+            }
+            if (pitchDeg === undefined || yawDeg === undefined) {
+                // Fallback: usa o centro da visão
+                pitchDeg = viewer.getPitch();
+                yawDeg = ((viewer.getYaw() % 360) + 360) % 360;
+            }
 
             // Preencher coordenadas
-            document.getElementById('hotspotPitch').value = pitchDeg.toFixed(1);
-            document.getElementById('hotspotYaw').value = yawDeg.toFixed(1);
 
-            // Habilitar botão salvar
-            document.getElementById('saveHotspotBtn').disabled = false;
+            console.log('[HS] handleViewerClick coords', { pitchDeg, yawDeg, hasMouseEventToCoords: typeof viewer?.mouseEventToCoords === 'function' });
 
-            // Desativar modo adicionar
-            toggleAddMode();
+            document.getElementById('hotspotPitch').value = Number(pitchDeg).toFixed(1);
+            document.getElementById('hotspotYaw').value = Number(yawDeg).toFixed(1);
+
+            console.log('[HS] handleViewerClick inputs set', { pitch: document.getElementById('hotspotPitch').value, yaw: document.getElementById('hotspotYaw').value });
+
+
+            // Atualizar habilitação do botão salvar com base nos campos
+            updateSaveButtonState();
+
+            // Desativar modo adicionar, mas manter as coordenadas
+            toggleAddMode(true);
 
             showAlert('Coordenadas definidas! Preencha as informações do hotspot.', 'success');
         }
@@ -1219,19 +1280,19 @@
 
             try {
                 let result;
-                
+
                 if (editingHotspot) {
                     result = await hotspotManager.updateHotspot(editingHotspot.id, hotspotData);
                 } else {
                     result = await hotspotManager.createHotspot(hotspotData);
                 }
-                
+
                 if (result.success) {
                     showAlert(
-                        editingHotspot ? 'Hotspot atualizado com sucesso!' : 'Hotspot criado com sucesso!', 
+                        editingHotspot ? 'Hotspot atualizado com sucesso!' : 'Hotspot criado com sucesso!',
                         'success'
                     );
-                    
+
                     clearHotspotForm();
                     await loadHotspots();
                 } else {
@@ -1262,7 +1323,7 @@
             if (!hotspot) return;
 
             editingHotspot = hotspot;
-            
+
             // Preencher formulário
             document.getElementById('hotspotTitle').value = hotspot.title;
             document.getElementById('hotspotDescription').value = hotspot.description || '';
@@ -1270,20 +1331,20 @@
             document.getElementById('hotspotYaw').value = hotspot.yaw;
             document.getElementById('hotspotColor').value = hotspot.color || '#007bff';
             document.getElementById('targetScene').value = hotspot.target_scene_id || '';
-            
+
             // Selecionar tipo
             document.querySelectorAll('.hotspot-type').forEach(t => t.classList.remove('selected'));
             document.querySelector(`[data-type="${hotspot.type}"]`).classList.add('selected');
             selectedHotspotType = hotspot.type;
-            
+
             // Mostrar campo de cena de destino se necessário
             const targetSceneGroup = document.getElementById('targetSceneGroup');
             targetSceneGroup.style.display = hotspot.type === 'navigation' ? 'block' : 'none';
-            
+
             // Habilitar botões
-            document.getElementById('saveHotspotBtn').disabled = false;
+            updateSaveButtonState();
             document.getElementById('cancelHotspotBtn').style.display = 'block';
-            
+
             showAlert('Editando hotspot. Modifique os campos e clique em Salvar.', 'info');
         };
 
@@ -1301,7 +1362,7 @@
 
             try {
                 const result = await hotspotManager.deleteHotspot(hotspotId);
-                
+
                 if (result.success) {
                     showAlert('Hotspot excluído com sucesso!', 'success');
                     await loadHotspots();
@@ -1320,7 +1381,7 @@
             document.querySelectorAll('.hotspot-item').forEach(item => {
                 item.classList.remove('selected');
             });
-            
+
             const item = document.querySelector(`[data-hotspot-id="${hotspotId}"]`);
             if (item) {
                 item.classList.add('selected');
@@ -1348,7 +1409,7 @@
             alert.textContent = message;
             alert.className = `alert ${type}`;
             alert.style.display = 'block';
-            
+
             // Auto-hide após 5 segundos
             setTimeout(() => {
                 alert.style.display = 'none';

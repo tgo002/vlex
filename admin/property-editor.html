@@ -710,7 +710,7 @@
     </div>
 
     <script type="module">
-        import { authManager, propertyManager, utils, supabase, ensureAdminSessionForTest } from '/shared/supabase-client.js';
+        import { authManager, propertyManager, sceneManager, utils, supabase, ensureAdminSessionForTest } from '/shared/supabase-client.js';
         import '/admin/auth-guard-fixed.js';
 
         let currentUser = null;
@@ -952,10 +952,10 @@
             document.getElementById('submitBtn').disabled = show;
         }
 
-        // Preview do tour
+        // Preview do tour — redireciona para detalhes da propriedade
         window.previewTour = function() {
             if (currentProperty) {
-                window.open(`/admin/tour-preview.html?id=${currentProperty.id}`, '_blank');
+                window.open(`/property-details/?id=${currentProperty.id}`, '_blank');
             }
         };
 
@@ -998,7 +998,7 @@
                     showAlert('Tour publicado com sucesso! Agora está visível publicamente.', 'success');
 
                     // Mostrar URL pública
-                    const publicUrl = `${window.location.origin}/client/tour.html?id=${currentProperty.id}`;
+                    const publicUrl = `${window.location.origin}/property-details/?id=${currentProperty.id}`;
                     prompt('URL pública do tour (Ctrl+C para copiar):', publicUrl);
                 } else {
                     showAlert(result.error || 'Erro ao publicar tour.', 'error');
@@ -1061,7 +1061,7 @@
                 publishBtn.innerHTML = '✅ Publicado';
                 publishBtn.className = 'btn btn-success';
                 publishBtn.onclick = () => {
-                    const publicUrl = `${window.location.origin}/client/tour.html?id=${currentProperty.id}`;
+                    const publicUrl = `${window.location.origin}/property-details/?id=${currentProperty.id}`;
                     window.open(publicUrl, '_blank');
                 };
             } else {
@@ -1143,12 +1143,62 @@
             updateGalleryDisplay();
         }
 
+        // Garante que exista uma propriedade (rascunho) antes de fazer uploads na criação
+        async function ensureDraftPropertyExists() {
+            if (currentProperty?.id) return true;
+            try {
+                // Tentar obter o user_id a partir da sessão atual
+                let userId = currentUser?.id;
+                if (!userId) {
+                    try {
+                        const { data: { user } } = await supabase.auth.getUser();
+                        if (user?.id) userId = user.id;
+                    } catch (_) {}
+                }
+
+                // Coletar dados atuais do formulário (ou defaults)
+                const formEl = document.getElementById('propertyForm');
+                const fd = formEl ? new FormData(formEl) : null;
+                const nowLabel = new Date().toLocaleString('pt-BR');
+                const draftData = {
+                    title: (fd?.get('title')?.toString().trim()) || `Rascunho ${nowLabel}`,
+                    description: fd?.get('description')?.toString() || '',
+                    price: fd?.get('price') ? parseFloat(fd.get('price')) : null,
+                    area: fd?.get('area') ? parseFloat(fd.get('area')) : null,
+                    bedrooms: fd?.get('bedrooms') ? parseInt(fd.get('bedrooms')) : null,
+                    bathrooms: fd?.get('bathrooms') ? parseInt(fd.get('bathrooms')) : null,
+                    address: fd?.get('address')?.toString() || '',
+                    city: fd?.get('city')?.toString() || '',
+                    state: fd?.get('state')?.toString() || '',
+                    status: 'draft',
+                    user_id: userId || null
+                };
+
+                const created = await propertyManager.createProperty(draftData);
+                if (!created?.success) throw new Error(created?.error || 'Falha ao criar rascunho');
+
+                currentProperty = created.data;
+                isEditing = true;
+                // Atualizar UI para modo de edição e URL com id
+                updateUIForEditing();
+                try { history.replaceState(null, '', `/admin/property-editor.html?id=${currentProperty.id}`); } catch (_) {}
+                return true;
+            } catch (e) {
+                console.error('❌ Não foi possível criar rascunho automaticamente:', e);
+                showAlert('Não foi possível criar rascunho para upload. Salve a propriedade primeiro.', 'error');
+                return false;
+            }
+        }
+
         // Upload de imagem para o Supabase Storage
         // FIX: utils.supabase era undefined (utils não expõe o cliente). Passamos a usar o 'supabase' exportado de shared/supabase-client.js.
         async function uploadImageToGallery(file) {
             if (!currentProperty?.id) {
-                console.error('❌ currentProperty não definido:', currentProperty);
-                throw new Error('Propriedade não encontrada');
+                console.warn('⚠️ currentProperty não definido. Criando rascunho para permitir upload...');
+                const ok = await ensureDraftPropertyExists();
+                if (!ok || !currentProperty?.id) {
+                    throw new Error('Propriedade não encontrada (falha ao criar rascunho)');
+                }
             }
 
             console.log('📤 Iniciando upload para propriedade:', currentProperty.id);
@@ -1287,13 +1337,13 @@
         window.setMainImage = async function(imageId) {
             try {
                 // Remover principal de todas as imagens
-                await utils.supabase
+                await supabase
                     .from('property_images')
                     .update({ is_main: false })
                     .eq('property_id', currentProperty.id);
 
                 // Definir nova imagem principal
-                const { data, error } = await utils.supabase
+                const { data, error } = await supabase
                     .from('property_images')
                     .update({ is_main: true })
                     .eq('id', imageId)

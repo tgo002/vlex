@@ -1,5 +1,6 @@
 // Configuração do cliente Supabase para o sistema de tours virtuais 360°
-import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+// Usando CDN direto para compatibilidade local
+const { createClient } = window.supabase;
 
 // Configurações do Supabase
 const SUPABASE_URL = 'https://ewivsujoqdnltdktkyvh.supabase.co';
