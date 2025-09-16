@@ -3,9 +3,9 @@ import { test, expect } from '@playwright/test';
 const BASE_URL = 'https://vlex-mu.vercel.app';
 
 async function loginOnce(page) {
-  // Ir para /admin e aguardar redirecionamento ao login
+  // Ir para /admin e aguardar o formulário de login ficar visível
   await page.goto(`${BASE_URL}/admin/`);
-  await page.waitForURL(/\/admin\/login-fixed(\/?|\.html)$/);
+  await page.waitForSelector('#email', { state: 'visible' });
 
   // Garantir que os campos não estão auto-preenchidos
   const email = page.locator('#email');
@@ -21,20 +21,30 @@ async function loginOnce(page) {
 
   // Submeter
   await Promise.all([
-    page.waitForNavigation({ url: `${BASE_URL}/admin/` }),
+    page.waitForURL(/\/admin(\/?|\/index\.html)?$/),
     page.getByRole('button', { name: 'Entrar' }).click(),
   ]);
 
   // Verificações pós-login
-  await expect(page).toHaveURL(`${BASE_URL}/admin/`);
-  await expect(page.getByText('Sair')).toBeVisible();
-  await expect(page.getByText('Dashboard')).toBeVisible();
+  await expect(page).toHaveURL(/\/admin(\/?|\/index\.html)?$/);
+  const logoutBtn = page.locator('.header .logout-btn');
+  await expect(logoutBtn).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 }
 
 async function logoutOnce(page) {
-  // Logout pelo botão "Sair" e esperar voltar para login
-  await page.getByText('Sair').click();
-  await page.waitForURL(/\/admin\/login.*\.html$/);
+  // Aceitar o diálogo de confirmação de logout se aparecer
+  page.once('dialog', d => d.accept());
+
+  // Tentar o botão de logout do indicador (sobreposição) primeiro; senão usar o do header
+  const overlayLogout = page.locator('#admin-user-indicator .logout-btn');
+  if (await overlayLogout.count() > 0 && await overlayLogout.first().isVisible()) {
+    await overlayLogout.first().click();
+  } else {
+    await page.locator('.header .logout-btn').click();
+  }
+
+  await page.waitForURL(/\/admin\/login-fixed(\/?|\.html)$/);
 }
 
 test.describe('Admin Login Flow @vlex-mu', () => {
