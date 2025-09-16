@@ -1,6 +1,22 @@
 // Configuração do cliente Supabase para o sistema de tours virtuais 360°
-// Usando CDN direto para compatibilidade local
-const { createClient } = window.supabase;
+// Carregamento robusto do createClient: usa window.supabase se existir; caso contrário, importa ESM (esm.sh) e preenche o global
+async function resolveCreateClient() {
+  if (window?.supabase?.createClient) return window.supabase.createClient;
+  try {
+    const mod = await import('https://esm.sh/@supabase/supabase-js@2?bundle');
+    window.supabase = window.supabase || {};
+    window.supabase.createClient = mod.createClient;
+    return mod.createClient;
+  } catch (e) {
+    // Fallback: aguarda UMD popular window.supabase
+    for (let i = 0; i < 50; i++) { // até ~5s
+      if (window?.supabase?.createClient) return window.supabase.createClient;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    throw new Error('Supabase createClient indisponível após tentativas');
+  }
+}
+const createClient = await resolveCreateClient();
 
 // Configurações do Supabase
 const SUPABASE_URL = 'https://ewivsujoqdnltdktkyvh.supabase.co';
