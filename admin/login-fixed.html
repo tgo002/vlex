@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso Administrativo - Tours Virtuais 360°</title>
 
-    <!-- Supabase CDN -->
+    <!-- Supabase CDN + Bootstrap determinístico -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="/shared/admin-bootstrap.js"></script>
     <style>
         * {
             margin: 0;
@@ -203,30 +204,32 @@
         <div class="login-form">
             <div id="alert" class="alert"></div>
             
-            <form id="loginForm">
+            <form id="loginForm" autocomplete="off" autocapitalize="none" spellcheck="false">
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        required 
-                        placeholder="admin@tours360.com"
-                        value="admin@tours360.com"
-                        autocomplete="email"
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        placeholder="seu@email.com"
+                        autocomplete="username"
+                        autocapitalize="none"
+                        spellcheck="false"
                     >
                 </div>
 
                 <div class="form-group">
                     <label for="password">Senha</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        required 
-                        placeholder="Admin@Tours360!2024"
-                        value="Admin@Tours360!2024"
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        placeholder="Sua senha"
                         autocomplete="current-password"
+                        autocapitalize="none"
+                        spellcheck="false"
                     >
                 </div>
 
@@ -257,158 +260,71 @@
     </div>
 
     <script type="module">
-        // Aguarda Supabase estar disponível
-        async function waitForSupabase() {
-            while (typeof window.supabase === 'undefined') {
-                await new Promise(r => setTimeout(r, 100));
-            }
+        // Usa o cliente compartilhado com autenticação real do Supabase
+        const { authManager } = await import('/shared/supabase-client.js');
+
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const alertBox = document.getElementById('alert');
+        const loading = document.getElementById('loading');
+        const loginBtn = document.getElementById('loginBtn');
+
+        function showAlert(message, type = 'error') {
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type}`;
+            alertBox.style.display = 'block';
         }
-        await waitForSupabase();
+        function hideAlert() { alertBox.style.display = 'none'; }
+        function setLoading(state) {
+            loading.style.display = state ? 'block' : 'none';
+            loginBtn.disabled = state;
+            loginBtn.textContent = state ? 'Entrando...' : 'Entrar';
+        }
 
-        const { ensureAdminSessionForTest } = await import('/shared/supabase-client.js');
-        // Sistema de login simplificado e robusto
-        class SimpleLoginManager {
-            constructor() {
-                this.isProcessing = false;
-                this.debugElement = document.getElementById('debugText');
-                this.init();
-            }
-
-            init() {
-                this.log('Sistema de login inicializado');
-                
-                // Verificar se já está logado
-                this.checkExistingAuth();
-                
-                // Setup do formulário
-                this.setupForm();
-            }
-
-            log(message) {
-                console.log(`🔐 ${message}`);
-                if (this.debugElement) {
-                    this.debugElement.innerHTML += `<br>${new Date().toLocaleTimeString()}: ${message}`;
-                }
-            }
-
-            async checkExistingAuth() {
-                // Verificar localStorage de teste
-                const testLogin = localStorage.getItem('test_admin_logged_in');
-                if (testLogin === 'true') {
-                    this.log('Login de teste detectado, garantindo sessão Supabase...');
-                    try { await ensureAdminSessionForTest(); } catch {}
-                    this.redirectToDashboard();
-                    return;
-                }
-
-                // Verificar token do Supabase
-                const authToken = localStorage.getItem('sb-ewivsujoqdnltdktkyvh-auth-token');
-                if (authToken) {
-                    try {
-                        const tokenData = JSON.parse(authToken);
-                        if (tokenData.access_token) {
-                            this.log('Token Supabase encontrado, redirecionando...');
-                            this.redirectToDashboard();
-                            return;
-                        }
-                    } catch (e) {
-                        this.log('Token inválido encontrado');
-                    }
-                }
-
-                this.log('Nenhuma autenticação encontrada');
-            }
-
-            setupForm() {
-                const form = document.getElementById('loginForm');
-                form.addEventListener('submit', (e) => this.handleLogin(e));
-            }
-
-            async handleLogin(e) {
-                e.preventDefault();
-                
-                if (this.isProcessing) {
-                    this.log('Login já em andamento...');
-                    return;
-                }
-
-                this.isProcessing = true;
-                this.showLoading(true);
-                this.hideAlert();
-
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-
-                this.log(`Tentando login com: ${email}`);
-
-                try {
-                    // Simular login bem-sucedido para as credenciais corretas
-                    if (email === 'admin@tours360.com' && password === 'Admin@Tours360!2024') {
-                        this.log('Credenciais corretas - simulando login');
-                        
-                        // Definir como logado no localStorage
-                        localStorage.setItem('test_admin_logged_in', 'true');
-                        localStorage.setItem('test_admin_email', email);
-
-                        // Garantir sessão Supabase para permitir Storage/DB em modo teste
-                        try { await ensureAdminSessionForTest(); } catch {}
-
-                        this.showAlert('Login realizado com sucesso!', 'success');
-
-                        setTimeout(() => {
-                            this.redirectToDashboard();
-                        }, 800);
-                    } else {
-                        this.log('Credenciais incorretas');
-                        this.showAlert('Credenciais inválidas. Verifique email e senha.');
-                    }
-                } catch (error) {
-                    this.log(`Erro no login: ${error.message}`);
-                    this.showAlert('Erro inesperado. Tente novamente.');
-                } finally {
-                    this.isProcessing = false;
-                    this.showLoading(false);
-                }
-            }
-
-            redirectToDashboard() {
-                this.log('Redirecionando para dashboard...');
-                
-                // Verificar se há URL de redirecionamento salva
+        // Redireciona se já estiver autenticado
+        authManager.onAuthChange((event, session) => {
+            if (session) {
                 const redirectUrl = sessionStorage.getItem('redirectAfterLogin') || '/admin/';
                 sessionStorage.removeItem('redirectAfterLogin');
-                
-                setTimeout(() => {
-                    window.location.href = redirectUrl;
-                }, 500);
+                window.location.href = redirectUrl;
             }
-
-            showAlert(message, type = 'error') {
-                const alert = document.getElementById('alert');
-                alert.textContent = message;
-                alert.className = `alert ${type}`;
-                alert.style.display = 'block';
-            }
-
-            hideAlert() {
-                const alert = document.getElementById('alert');
-                alert.style.display = 'none';
-            }
-
-            showLoading(show = true) {
-                const loading = document.getElementById('loading');
-                const loginBtn = document.getElementById('loginBtn');
-                
-                loading.style.display = show ? 'block' : 'none';
-                loginBtn.disabled = show;
-                loginBtn.textContent = show ? 'Entrando...' : 'Entrar';
-            }
-        }
-
-        // Inicializar quando DOM estiver pronto
-        document.addEventListener('DOMContentLoaded', () => {
-            new SimpleLoginManager();
         });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            if (!email || !password) {
+                showAlert('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            setLoading(true);
+            try {
+                const result = await authManager.signIn(email, password);
+                if (!result.success) {
+                    showAlert(result.error || 'Erro ao fazer login.');
+                } else {
+                    showAlert('Login realizado com sucesso! Redirecionando...', 'success');
+                    // onAuthChange fará o redirecionamento
+                }
+            } catch (err) {
+                showAlert('Erro inesperado. Tente novamente.');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // Prevenir auto-preenchimento agressivo de alguns navegadores
+        emailInput.value = '';
+        passwordInput.value = '';
+        emailInput.setAttribute('autocomplete', 'username');
+        passwordInput.setAttribute('autocomplete', 'current-password');
+        emailInput.focus();
     </script>
 </body>
 </html>
