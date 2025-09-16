@@ -521,15 +521,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
     <script type="module">
-        // Aguardar carregamento do Supabase de forma assíncrona
-        async function waitForSupabase() {
-            while (typeof window.supabase === 'undefined') {
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-        }
-
-        await waitForSupabase();
-
+        // Inicializa Supabase pelo módulo compartilhado (garante createClient sem depender do timing do UMD)
         const { authManager, propertyManager, sceneManager, utils } = await import('/shared/supabase-client.js');
         import '/admin/auth-guard-fixed.js';
 
