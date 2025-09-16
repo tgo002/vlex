@@ -521,10 +521,14 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script type="module">
-        // Aguardar carregamento do Supabase
-        while (typeof window.supabase === 'undefined') {
-            await new Promise(resolve => setTimeout(resolve, 100));
+        // Aguardar carregamento do Supabase de forma assíncrona
+        async function waitForSupabase() {
+            while (typeof window.supabase === 'undefined') {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
         }
+
+        await waitForSupabase();
 
         import { authManager, propertyManager, sceneManager, utils } from '/shared/supabase-client.js';
         import '/admin/auth-guard-fixed.js';
