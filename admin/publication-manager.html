@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciador de Publicações - Sistema de Tours Virtuais 360°</title>
+    <!-- Supabase CDN (carregado cedo para garantir window.supabase) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -492,7 +495,7 @@
                     </div>
                     <div class="filter-group">
                         <label>Buscar</label>
-                        <input type="text" id="searchFilter" placeholder="Título da propriedade..." 
+                        <input type="text" id="searchFilter" placeholder="Título da propriedade..."
                                onkeyup="filterProperties()">
                     </div>
                     <div class="filter-group">
@@ -511,14 +514,11 @@
                     <div class="spinner"></div>
                     <p>Carregando propriedades...</p>
                 </div>
-                
+
                 <div id="propertiesContainer"></div>
             </div>
         </div>
     </div>
-
-    <!-- Supabase CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
     <script type="module">
         // Inicializa Supabase pelo módulo compartilhado (garante createClient sem depender do timing do UMD)
@@ -557,12 +557,12 @@
         async function loadProperties() {
             const container = document.getElementById('propertiesContainer');
             const loading = document.getElementById('propertiesLoading');
-            
+
             loading.style.display = 'block';
-            
+
             try {
                 const result = await propertyManager.getProperties();
-                
+
                 if (result.success) {
                     allProperties = result.data || [];
                     filteredProperties = [...allProperties];
@@ -608,10 +608,10 @@
             // Aplicar filtros
             filteredProperties = allProperties.filter(property => {
                 const matchesStatus = !statusFilter || property.status === statusFilter;
-                const matchesSearch = !searchFilter || 
+                const matchesSearch = !searchFilter ||
                     property.title.toLowerCase().includes(searchFilter) ||
                     (property.description && property.description.toLowerCase().includes(searchFilter));
-                
+
                 return matchesStatus && matchesSearch;
             });
 
@@ -641,7 +641,7 @@
         // Renderizar propriedades
         function renderProperties() {
             const container = document.getElementById('propertiesContainer');
-            
+
             if (filteredProperties.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
@@ -666,7 +666,7 @@
         // Renderizar card de propriedade
         function renderPropertyCard(property) {
             const createdDate = new Date(property.created_at).toLocaleDateString('pt-BR');
-            const publishedDate = property.published_at ? 
+            const publishedDate = property.published_at ?
                 new Date(property.published_at).toLocaleDateString('pt-BR') : null;
 
             return `
@@ -858,7 +858,7 @@
             alert.textContent = message;
             alert.className = `alert ${type}`;
             alert.style.display = 'block';
-            
+
             // Auto-hide após 5 segundos
             setTimeout(() => {
                 alert.style.display = 'none';
