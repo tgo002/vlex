@@ -415,7 +415,7 @@
 
         await waitForSupabase();
 
-        import { authManager, propertyManager, sceneManager, utils } from '/shared/supabase-client.js';
+        const { authManager, propertyManager, sceneManager, utils } = await import('/shared/supabase-client.js');
         import { ImageUploader } from '/shared/image-uploader.js';
         import '/admin/auth-guard-fixed.js';
 

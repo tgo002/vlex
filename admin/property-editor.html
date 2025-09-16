@@ -713,7 +713,15 @@
     </div>
 
     <script type="module">
-        import { authManager, propertyManager, sceneManager, utils, supabase, ensureAdminSessionForTest } from '/shared/supabase-client.js';
+        // Aguarda Supabase estar disponível
+        async function waitForSupabase() {
+            while (typeof window.supabase === 'undefined') {
+                await new Promise(r => setTimeout(r, 100));
+            }
+        }
+        await waitForSupabase();
+
+        const { authManager, propertyManager, sceneManager, utils, supabase, ensureAdminSessionForTest } = await import('/shared/supabase-client.js');
         import '/admin/auth-guard-fixed.js';
 
         let currentUser = null;

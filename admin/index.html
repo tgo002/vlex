@@ -545,7 +545,7 @@
     </div>
 
     <script type="module">
-        import { authManager, propertyManager, utils, supabase } from '../shared/supabase-client.js';
+        const { authManager, propertyManager, utils, supabase } = await import('../shared/supabase-client.js');
         // Auth guard antigo removido - usando versão corrigida
 
         let currentUser = null;

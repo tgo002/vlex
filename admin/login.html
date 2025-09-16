@@ -311,8 +311,19 @@
         </div>
     </div>
 
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script type="module">
-        import { authManager } from '../shared/supabase-client.js';
+        // Aguarda Supabase estar dispon ível
+        async function waitForSupabase() {
+            while (typeof window.supabase === 'undefined') {
+                await new Promise(r => setTimeout(r, 100));
+            }
+        }
+        await waitForSupabase();
+
+        const { authManager } = await import('../shared/supabase-client.js');
 
         // Elementos DOM
         const loginForm = document.getElementById('loginForm');

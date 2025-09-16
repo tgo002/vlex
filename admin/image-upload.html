@@ -288,8 +288,19 @@
         </div>
     </div>
 
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script type="module">
-        import { imageManager, authManager } from '/shared/supabase-client.js';
+        // Aguarda Supabase estar disponível
+        async function waitForSupabase() {
+            while (typeof window.supabase === 'undefined') {
+                await new Promise(r => setTimeout(r, 100));
+            }
+        }
+        await waitForSupabase();
+
+        const { imageManager, authManager } = await import('/shared/supabase-client.js');
         import '/admin/auth-guard-fixed.js';
 
         let selectedFile = null;

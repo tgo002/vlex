@@ -257,7 +257,15 @@
     </div>
 
     <script type="module">
-        import { ensureAdminSessionForTest } from '/shared/supabase-client.js';
+        // Aguarda Supabase estar disponível
+        async function waitForSupabase() {
+            while (typeof window.supabase === 'undefined') {
+                await new Promise(r => setTimeout(r, 100));
+            }
+        }
+        await waitForSupabase();
+
+        const { ensureAdminSessionForTest } = await import('/shared/supabase-client.js');
         // Sistema de login simplificado e robusto
         class SimpleLoginManager {
             constructor() {
