@@ -825,7 +825,7 @@
         <!-- Contact Minimal -->
         <div class="contact-minimal" id="contactMinimal" style="position:absolute; top:20px; right:20px; z-index:2000; background: rgba(0,0,0,0.8); color:#fff; padding:10px 14px; border-radius:10px; backdrop-filter: blur(10px); display:flex; align-items:center; gap:10px;">
             <span id="contactPhone" style="font-weight:600;"></span>
-            <button class="action-btn" style="background:linear-gradient(135deg,#28a745,#218838);" onclick="shareOnWhatsApp()">💬 Contato</button>
+            <button class="action-btn" style="background:linear-gradient(135deg,#25D366,#128C7E);" onclick="shareOnWhatsApp()">WhatsApp</button>
         </div>
 
         <!-- Scene Navigator -->
@@ -866,6 +866,11 @@
         let contactForm = null;
         let socialShare = null;
         let siteConfig = null;
+
+	        // Flags de transição suave entre cenas
+	        let firstLoadDone = false;
+	        let pendingZoom = false;
+
 
         // Carregar configurações do site
         async function loadSiteConfig() {
@@ -1045,6 +1050,7 @@
                 default: {
                     firstScene: 'scene1', // Será ajustado no loop
                     autoLoad: true,
+                    sceneFadeDuration: 1200,
                     showControls: true,
                     showFullscreenCtrl: false,
                     showZoomCtrl: true,
@@ -1111,11 +1117,20 @@
                 console.log('Viewer criado com sucesso');
 
                 viewer.on('load', () => {
-                    console.log('✅ Cena carregada:', currentScene.title);
-                    console.log('✅ Tour carregado com sucesso!');
+                    console.log('✅ Cena carregada:', currentScene?.title || viewer.getScene());
+                    if (!firstLoadDone) { firstLoadDone = true; return; }
+                    if (pendingZoom) {
+                        const tPitch = parseFloat(currentScene?.initial_pitch) || 0;
+                        const tYaw = parseFloat(currentScene?.initial_yaw) || 0;
+                        const tHfov = parseFloat(currentScene?.initial_hfov) || 110;
+                        viewer.setHfov(Math.min(140, tHfov + 20));
+                        setTimeout(() => viewer.lookAt(tPitch, tYaw, tHfov, 1000), 50);
+                    }
+                    pendingZoom = false;
                 });
 
                 viewer.on('scenechange', () => {
+                    pendingZoom = true;
                     const currentSceneId = viewer.getScene();
                     console.log('🔄 Mudança de cena para:', currentSceneId);
                 });
@@ -1360,11 +1375,12 @@
             const targetIndex = scenes.findIndex(s => s.id === sceneId);
             const pannellumSceneId = targetIndex >= 0 ? `scene${targetIndex + 1}` : null;
             if (pannellumSceneId) {
+                pendingZoom = true;
                 viewer.loadScene(
                     pannellumSceneId,
                     newScene.initial_pitch || 0,
                     newScene.initial_yaw || 0,
-                    newScene.initial_hfov || 110
+                    Math.min(140, (newScene.initial_hfov || 110) + 20)
                 );
             }
         };

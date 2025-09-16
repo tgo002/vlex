@@ -82,7 +82,7 @@ class AdminAuthGuard {
         const testLogin = localStorage.getItem('test_admin_logged_in');
         if (testLogin === 'true') {
             console.log('🧪 Modo de teste detectado');
-            this.addTestUserIndicator();
+            // Removido: indicador visual de usuário logado (overlay)
             return true;
         }
 
@@ -95,8 +95,7 @@ class AdminAuthGuard {
             return false;
         }
 
-        // Adicionar indicador visual de usuário logado
-        this.addUserIndicator();
+        // Indicador visual removido do UI (não exibir overlay no ambiente admin/cliente)
         return true;
     }
 

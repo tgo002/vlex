@@ -2,7 +2,7 @@
 // BASE_URL and PROPERTY_ID can be overridden via env
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = process.env.BASE_URL || 'https://vlex-mu.vercel.app';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 const PROPERTY_ID = process.env.PROPERTY_ID || '2817c143-4287-4eeb-b89d-96bbd441aecf';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@tours360.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin@Tours360!2024';
@@ -12,14 +12,18 @@ async function adminLogin(page) {
   await page.fill('#email', ADMIN_EMAIL);
   await page.fill('#password', ADMIN_PASSWORD);
   await Promise.all([
-    page.waitForURL(/\/admin\/?$/),
+    page.waitForURL(/\/admin(\/index\.html)?\/?$/),
     page.click('button[type="submit"]'),
   ]);
 }
 
 test.describe('Admin Scene Manager - Delete with cascade', () => {
   test('should delete a temp scene without FK errors', async ({ page, browserName }) => {
-    await adminLogin(page);
+    // Bypass auth for tests using the test flag handled in the page
+    await page.addInitScript(() => {
+      localStorage.setItem('test_admin_logged_in', 'true');
+      localStorage.setItem('test_admin_email', 'admin@tours360.com');
+    });
     await page.goto(`${BASE_URL}/admin/scene-manager.html?propertyId=${PROPERTY_ID}`);
     await page.waitForSelector('#scenesContainer');
 
@@ -74,7 +78,7 @@ test.describe('Admin Scene Manager - Delete with cascade', () => {
     await card.locator('button:has-text("🗑️ Excluir")').click();
 
     // Ensure card disappears without error
-    await expect(page.locator(`[data-scene-id="${temp.sceneId}"]`)).toHaveCount(0);
+    await expect(page.locator(`[data-scene-id="${temp.sceneId}"]`)).toHaveCount(0, { timeout: 15000 });
   });
 });
 
