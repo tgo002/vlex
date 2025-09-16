@@ -7,6 +7,17 @@
     <!-- Supabase CDN (carregado cedo para garantir window.supabase) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
+    <script>
+        // Garantir disponibilidade imediata de window.supabase e createClient (stub) para evitar condições de corrida
+        window.supabase = window.supabase || {};
+        if (typeof window.supabase.createClient !== 'function') {
+            window.supabase.createClient = function() {
+                console.warn('[supabase stub] createClient chamado antes da lib real.');
+                throw new Error('Supabase ainda não carregou');
+            };
+        }
+    </script>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
     <style>
