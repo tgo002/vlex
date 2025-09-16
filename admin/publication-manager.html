@@ -4,19 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciador de Publicações - Sistema de Tours Virtuais 360°</title>
-    <!-- Supabase CDN (carregado cedo para garantir window.supabase) -->
+    <!-- Bootstrap determinístico do Supabase (garante readiness) -->
+    <script src="/shared/admin-bootstrap.js"></script>
+    <!-- UMD opcional (bootstrap injeta se faltar) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-
-    <script>
-        // Garantir disponibilidade imediata de window.supabase e createClient (stub) para evitar condições de corrida
-        window.supabase = window.supabase || {};
-        if (typeof window.supabase.createClient !== 'function') {
-            window.supabase.createClient = function() {
-                console.warn('[supabase stub] createClient chamado antes da lib real.');
-                throw new Error('Supabase ainda não carregou');
-            };
-        }
-    </script>
 
     <style>
         * {
@@ -452,7 +443,7 @@
     <header class="header">
         <div class="header-content">
             <div class="header-left">
-                <a href="index.html" class="back-btn">
+                <a href="/admin/index.html" class="back-btn">
                     ← Dashboard
                 </a>
                 <h1 class="page-title">Gerenciador de Publicações</h1>
@@ -694,7 +685,7 @@
                             ${publishedDate ? `<span>🌐 Publicado: ${publishedDate}</span>` : ''}
                         </div>
                         <div class="property-actions">
-                            <a href="property-editor.html?id=${property.id}" class="btn btn-primary">
+                            <a href="/admin/property-editor.html?id=${property.id}" class="btn btn-primary">
                                 ✏️ Editar
                             </a>
                             ${property.status === 'draft' ? `

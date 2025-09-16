@@ -1,5 +1,10 @@
 // Configuração do cliente Supabase para o sistema de tours virtuais 360°
 // Carregamento robusto do createClient: usa window.supabase se existir; caso contrário, importa ESM (esm.sh) e preenche o global
+// Aguarda bootstrap determinístico se disponível
+if (typeof window !== 'undefined' && window.__supabaseReady && typeof window.__supabaseReady.then === 'function') {
+  try { await window.__supabaseReady; } catch (e) {}
+}
+
 async function resolveCreateClient() {
   if (window?.supabase?.createClient) return window.supabase.createClient;
   try {

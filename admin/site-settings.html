@@ -239,7 +239,7 @@
                 Configurações do Site
             </div>
             <div class="user-menu">
-                <a href="index.html" class="back-btn">
+                <a href="/admin/index.html" class="back-btn">
                     ← Voltar ao Dashboard
                 </a>
             </div>
@@ -425,14 +425,12 @@
         </div>
     </div>
 
-    <!-- Supabase CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <!-- Bootstrap determinístico do Supabase -->
+    <script src="/shared/admin-bootstrap.js"></script>
 
-    <script>
-        // Configuração do Supabase
-        const SUPABASE_URL = 'https://ewivsujoqdnltdktkyvh.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3aXZzdWpvcWRubHRka3RreXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNjIwMzAsImV4cCI6MjA3MjkzODAzMH0.qcSgD6XCJvVj1UsltzvqXeHEBU0fMHB9e25CID4M9Yo';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <script type="module">
+        // Usa o cliente compartilhado (aguarda readiness automaticamente)
+        const { supabase } = await import('/shared/supabase-client.js');
 
         let settings = {};
 
