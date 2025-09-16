@@ -270,5 +270,3 @@ simpleAuthGuard = new SimpleAuthGuard();
 
 // Exportar para uso global
 window.simpleAuthGuard = simpleAuthGuard;
-
-export default SimpleAuthGuard;

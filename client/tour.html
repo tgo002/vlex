@@ -55,6 +55,9 @@
     <!-- Pannellum CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
 
+    <!-- Tema Minimalista -->
+    <link rel="stylesheet" href="../shared/minimalist-theme.css">
+
     <style>
         * {
             margin: 0;
@@ -81,73 +84,102 @@
             height: 100%;
         }
 
-        /* Loading Screen */
+        /* Loading Screen - Design Minimalista */
         .loading-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--color-white);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 3000;
-            transition: opacity 0.5s ease;
+            transition: opacity var(--transition-slow);
+        }
+
+        .loading-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(183, 149, 11, 0.05) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(183, 149, 11, 0.03) 0%, transparent 25%);
+            pointer-events: none;
         }
 
         .loading-logo {
-            font-size: 80px;
-            margin-bottom: 30px;
+            font-size: var(--text-6xl);
+            margin-bottom: var(--space-8);
             animation: pulse 2s infinite;
+            position: relative;
+            z-index: 2;
         }
 
         .loading-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 15px;
+            font-family: var(--font-display);
+            font-size: var(--text-3xl);
+            font-weight: var(--font-semibold);
+            color: var(--color-black);
+            margin-bottom: var(--space-4);
             text-align: center;
+            position: relative;
+            z-index: 2;
         }
 
         .loading-subtitle {
-            font-size: 18px;
-            opacity: 0.8;
-            margin-bottom: 40px;
+            font-family: var(--font-primary);
+            font-size: var(--text-lg);
+            color: var(--color-gray-600);
+            margin-bottom: var(--space-10);
             text-align: center;
+            position: relative;
+            z-index: 2;
         }
 
         .loading-spinner {
             width: 60px;
             height: 60px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid white;
+            border: 3px solid var(--color-gray-200);
+            border-top: 3px solid var(--color-gold);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            margin-bottom: var(--space-5);
+            position: relative;
+            z-index: 2;
         }
 
         .loading-progress {
             width: 300px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
+            height: 4px;
+            background: var(--color-gray-200);
+            border-radius: var(--radius-full);
             overflow: hidden;
-            margin-bottom: 15px;
+            margin-bottom: var(--space-4);
+            position: relative;
+            z-index: 2;
         }
 
         .loading-progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #00d4ff, #090979);
+            background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light));
             width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 3px;
+            transition: width var(--transition-normal);
+            border-radius: var(--radius-full);
         }
 
         .loading-text {
-            font-size: 14px;
-            opacity: 0.7;
+            font-family: var(--font-primary);
+            font-size: var(--text-sm);
+            color: var(--color-gray-500);
             text-align: center;
+            position: relative;
+            z-index: 2;
         }
 
         @keyframes spin {
@@ -221,51 +253,120 @@
             color: #ee5a24;
         }
 
-        /* Tour Controls */
+        /* Mobile Back Button - Design Minimalista */
+        .mobile-back-btn {
+            position: absolute;
+            top: var(--space-6);
+            left: var(--space-6);
+            z-index: 2100;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            display: none;
+            opacity: 0;
+            animation: fadeInLeft 1s ease 1.5s forwards;
+        }
+
+        .mobile-back-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
+        /* Mobile WhatsApp Button - Design Minimalista */
+        .mobile-whatsapp-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 2100;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+            display: none;
+            opacity: 0;
+            animation: fadeInUp 1s ease 2s forwards;
+        }
+
+        .mobile-whatsapp-btn:hover {
+            background: #128C7E;
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
+        }
+
+        .mobile-whatsapp-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Tour Controls - Design Minimalista */
         .tour-controls {
             position: absolute;
             top: 20px;
-            left: 20px;
+            left: 80px;
             z-index: 2000;
             display: flex;
-            gap: 10px;
+            gap: var(--space-3);
             opacity: 0;
             animation: fadeInDown 1s ease 2s forwards;
         }
 
         .control-btn {
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border: none;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--color-black);
+            border: 1px solid var(--color-gray-200);
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-lg);
+            font-family: var(--font-primary);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-2);
             backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
         }
 
         .control-btn:hover {
-            background: rgba(0, 0, 0, 0.9);
-            transform: translateY(-2px);
+            background: var(--color-white);
+            border-color: var(--color-gold);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
-        /* Scene Navigator */
+        .control-btn.active {
+            background: var(--color-gold);
+            color: var(--color-white);
+            border-color: var(--color-gold);
+        }
+
+        /* Scene Navigator - Design Minimalista */
         .scene-navigator {
             position: absolute;
-            bottom: 20px;
+            bottom: var(--space-6);
             left: 50%;
             transform: translateX(-50%);
             z-index: 2000;
             display: flex;
-            gap: 10px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
+            gap: var(--space-3);
+            padding: var(--space-4);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-xl);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-lg);
             backdrop-filter: blur(10px);
             opacity: 0;
             animation: fadeInUp 1s ease 2.5s forwards;
@@ -489,9 +590,17 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .mobile-back-btn {
+                display: block;
+            }
+
+            .mobile-whatsapp-btn {
+                display: block;
+            }
+
             .tour-controls {
                 top: 10px;
-                left: 10px;
+                left: 70px;
                 flex-direction: column;
             }
 
@@ -562,35 +671,39 @@
             }
         }
 
-        /* Custom Hotspot Styles */
+        /* Custom Hotspot Styles - Design Minimalista */
         .pnlm-hotspot-base.hotspot-info {
-            background: #007bff !important;
-            border: 3px solid white !important;
+            background: var(--color-gold) !important;
+            border: 2px solid var(--color-white) !important;
             border-radius: 50% !important;
             width: 20px !important;
             height: 20px !important;
             cursor: pointer !important;
-            transition: all 0.3s ease !important;
+            transition: all var(--transition-normal) !important;
+            box-shadow: 0 2px 8px rgba(183, 149, 11, 0.3) !important;
         }
 
         .pnlm-hotspot-base.hotspot-info:hover {
-            background: #0056b3 !important;
-            transform: scale(1.3) !important;
+            background: var(--color-gold-dark) !important;
+            transform: scale(1.2) !important;
+            box-shadow: 0 4px 12px rgba(183, 149, 11, 0.4) !important;
         }
 
         .pnlm-hotspot-base.hotspot-navigation {
-            background: #28a745 !important;
-            border: 3px solid white !important;
-            border-radius: 10% !important;
+            background: var(--color-black) !important;
+            border: 2px solid var(--color-white) !important;
+            border-radius: 20% !important;
             width: 24px !important;
             height: 24px !important;
             cursor: pointer !important;
-            transition: all 0.3s ease !important;
+            transition: all var(--transition-normal) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
         }
 
         .pnlm-hotspot-base.hotspot-navigation:hover {
-            background: #218838 !important;
-            transform: scale(1.3) !important;
+            background: var(--color-gray-800) !important;
+            transform: scale(1.2) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
         }
 
         .pnlm-hotspot-base.hotspot-highlight {
@@ -686,6 +799,16 @@
         <!-- Panorama Viewer -->
         <div id="panorama"></div>
 
+        <!-- Mobile Back Button -->
+        <button class="mobile-back-btn" onclick="goBack()" title="Voltar">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+
+        <!-- Mobile WhatsApp Button -->
+        <button class="mobile-whatsapp-btn" onclick="openWhatsApp()" title="Contato WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </button>
+
         <!-- Tour Controls -->
         <div class="tour-controls">
             <button class="control-btn" onclick="toggleFullscreen()">
@@ -738,8 +861,11 @@
     <!-- Pannellum JS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
     <script type="module">
-        import { propertyManager, sceneManager, hotspotManager, utils } from '/shared/supabase-client.js';
+        import { propertyManager, sceneManager, hotspotManager, utils, supabase } from '/shared/supabase-client.js';
         import { ContactForm } from '/shared/contact-form.js';
         import { SocialShare } from '/shared/social-share.js';
 
@@ -752,6 +878,49 @@
         let isAutoRotating = false;
         let contactForm = null;
         let socialShare = null;
+        let siteConfig = null;
+
+        // Carregar configurações do site
+        async function loadSiteConfig() {
+            try {
+                const { data: config, error } = await supabase
+                    .from('site_settings')
+                    .select('*')
+                    .single();
+
+                if (error) {
+                    console.warn('Erro ao carregar configurações do site:', error);
+                    // Usar configurações padrão
+                    siteConfig = {
+                        company_name: 'ValorExpert',
+                        phone_number: '+55 (11) 9999-9999',
+                        whatsapp_number: '5511999999999',
+                        email: 'contato@tours360.com',
+                        address: 'São Paulo, SP - Brasil',
+                        broker_name: 'João Silva',
+                        creci_number: '123456',
+                        business_hours: 'Segunda a Sexta: 8h às 18h\nSábado: 8h às 14h'
+                    };
+                } else {
+                    siteConfig = config;
+                }
+
+                console.log('✅ Configurações do site carregadas:', siteConfig);
+            } catch (error) {
+                console.error('Erro ao carregar configurações:', error);
+                // Fallback para configurações padrão
+                siteConfig = {
+                    company_name: 'ValorExpert',
+                    phone_number: '+55 (11) 9999-9999',
+                    whatsapp_number: '5511999999999',
+                    email: 'contato@tours360.com',
+                    address: 'São Paulo, SP - Brasil',
+                    broker_name: 'João Silva',
+                    creci_number: '123456',
+                    business_hours: 'Segunda a Sexta: 8h às 18h\nSábado: 8h às 14h'
+                };
+            }
+        }
 
         // Inicializar tour
         async function initTour() {
@@ -764,22 +933,26 @@
                     throw new Error('ID da propriedade não encontrado na URL');
                 }
 
-                updateLoadingProgress(10, 'Carregando propriedade...');
+                updateLoadingProgress(5, 'Carregando configurações...');
+                await loadSiteConfig();
+
+                updateLoadingProgress(15, 'Carregando propriedade...');
                 await loadProperty();
 
-                updateLoadingProgress(30, 'Carregando cenas...');
+                updateLoadingProgress(35, 'Carregando cenas...');
                 await loadScenes();
 
-                updateLoadingProgress(50, 'Carregando hotspots...');
+                updateLoadingProgress(55, 'Carregando hotspots...');
                 await loadAllHotspots();
 
-                updateLoadingProgress(70, 'Configurando visualizador...');
+                updateLoadingProgress(75, 'Configurando visualizador...');
                 await initViewer();
 
                 updateLoadingProgress(90, 'Finalizando...');
                 updateMetaTags();
                 updatePropertyInfo();
                 updateSceneNavigator();
+                updateContactInfo();
                 initContactForm();
                 initSocialShare();
 
@@ -1123,6 +1296,40 @@
             `).join('');
         }
 
+        // Atualizar informações de contato
+        function updateContactInfo() {
+            if (!siteConfig) return;
+
+            // Atualizar informações do corretor se existir elemento
+            const brokerElement = document.getElementById('brokerInfo');
+            if (brokerElement) {
+                const brokerName = siteConfig.broker_name || 'João Silva';
+                const creciNumber = siteConfig.creci_number || '123456';
+                brokerElement.textContent = `${brokerName} - CRECI ${creciNumber}`;
+            }
+
+            // Atualizar horário de atendimento se existir elemento
+            const businessHoursElement = document.getElementById('businessHours');
+            if (businessHoursElement) {
+                const businessHours = siteConfig.business_hours || 'Segunda a Sexta: 8h às 18h\nSábado: 8h às 14h';
+                businessHoursElement.innerHTML = businessHours.replace(/\n/g, '<br>');
+            }
+
+            // Atualizar telefone se existir elemento
+            const phoneElement = document.getElementById('contactPhone');
+            if (phoneElement) {
+                phoneElement.textContent = siteConfig.phone_number || '+55 (11) 9999-9999';
+            }
+
+            // Atualizar email se existir elemento
+            const emailElement = document.getElementById('contactEmail');
+            if (emailElement) {
+                emailElement.textContent = siteConfig.email || 'contato@tours360.com';
+            }
+
+            console.log('✅ Informações de contato atualizadas no tour');
+        }
+
         // Atualizar navegador de cenas
         function updateSceneNavigator() {
             const navigator = document.getElementById('sceneNavigator');
@@ -1211,9 +1418,10 @@
 
         // Compartilhar tour
         window.shareOnWhatsApp = function() {
+            const whatsappNumber = siteConfig?.whatsapp_number || '5511999999999';
             const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent(`Confira este tour virtual 360° de ${currentProperty.title}!`);
-            window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+            const text = encodeURIComponent(`Olá! Gostaria de mais informações sobre ${currentProperty.title}. Confira o tour virtual 360°: ${window.location.href}`);
+            window.open(`https://wa.me/${whatsappNumber}?text=${text}`, '_blank');
         };
 
         // Compartilhar tour (genérico)
@@ -1278,6 +1486,35 @@
             if (socialShare) {
                 socialShare.show();
             }
+        };
+
+        // Função para voltar
+        window.goBack = function() {
+            // Tentar voltar na história do navegador
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // Fallback: ir para a página inicial
+                window.location.href = '/index.html';
+            }
+        };
+
+        // Função para abrir WhatsApp
+        window.openWhatsApp = function() {
+            if (!siteConfig || !currentProperty) {
+                console.warn('Configurações ou propriedade não carregadas');
+                return;
+            }
+
+            const whatsappNumber = siteConfig.whatsapp_number || '5511999999999';
+            const propertyTitle = currentProperty.title || 'Propriedade';
+            const tourUrl = window.location.href;
+
+            const message = `Olá! Tenho interesse na propriedade "${propertyTitle}". Gostaria de mais informações. Tour virtual: ${tourUrl}`;
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+            window.open(whatsappUrl, '_blank');
         };
 
         // Tentar novamente

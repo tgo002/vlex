@@ -1111,10 +1111,7 @@
             <section class="actions-section">
                 <div class="section-container">
                     <div class="action-buttons">
-                        <button class="action-btn primary" onclick="downloadImage()">
-                            <i class="fas fa-download"></i>
-                            Baixar Imagem
-                        </button>
+
                         <button class="action-btn" onclick="startTour()">
                             <i class="fas fa-vr-cardboard"></i>
                             Iniciar Tour 360°
@@ -1235,14 +1232,14 @@
                             <i class="fas fa-user-tie"></i>
                             <div>
                                 <h4>Corretor Responsável</h4>
-                                <p>João Silva - CRECI 123456</p>
+                                <p id="brokerInfo">João Silva - CRECI 123456</p>
                             </div>
                         </div>
                         <div class="info-card">
                             <i class="fas fa-clock"></i>
                             <div>
                                 <h4>Horário de Atendimento</h4>
-                                <p>Segunda a Sexta: 8h às 18h<br>Sábado: 8h às 14h</p>
+                                <p id="businessHours">Segunda a Sexta: 8h às 18h<br>Sábado: 8h às 14h</p>
                             </div>
                         </div>
                         <div class="info-card">
@@ -1273,15 +1270,9 @@
                 <div class="footer-links">
                     <div class="footer-column">
                         <h4>Navegação</h4>
-                        <a href="/index.html#properties">Propriedades</a>
+                        <a href="/index.html#properties">Imóveis</a>
                         <a href="/index.html#about">Sobre</a>
                         <a href="/index.html#contact">Contato</a>
-                    </div>
-                    <div class="footer-column">
-                        <h4>Suporte</h4>
-                        <a href="#">Central de Ajuda</a>
-                        <a href="#">Termos de Uso</a>
-                        <a href="#">Privacidade</a>
                     </div>
                 </div>
 
@@ -1301,6 +1292,9 @@
             </div>
         </div>
     </footer>
+
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
     <script type="module">
         import { utils } from '/shared/supabase-client.js';
@@ -1590,7 +1584,8 @@
         function displaySpecs() {
             const specsContainer = document.getElementById('specsContainer');
             const specs = [
-                { label: 'Tipo', value: currentProperty.property_type || 'N/A' },
+                { label: 'Cidade', value: currentProperty.city || 'N/A' },
+                { label: 'Estado', value: currentProperty.state || 'N/A' },
                 { label: 'Status', value: 'Disponível' },
                 { label: 'Código', value: currentProperty.id.slice(0, 8).toUpperCase() }
             ];
@@ -1625,7 +1620,7 @@
                 const { data: settings, error } = await supabase
                     .from('site_settings')
                     .select('*')
-                    .in('setting_key', ['whatsapp_number', 'phone_number']);
+                    .in('setting_key', ['whatsapp_number', 'phone_number', 'broker_name', 'creci_number', 'business_hours']);
 
                 if (error) {
                     console.warn('Erro ao carregar configurações WhatsApp:', error);
@@ -1640,11 +1635,26 @@
 
                 const whatsappNumber = config.whatsapp_number || '5511999999999';
                 const phoneNumber = config.phone_number || '+55 (11) 9999-9999';
+                const brokerName = config.broker_name || 'João Silva';
+                const creciNumber = config.creci_number || '123456';
+                const businessHours = config.business_hours || 'Segunda a Sexta: 8h às 18h\nSábado: 8h às 14h';
 
                 // Atualizar número de telefone na interface
                 const phoneElement = document.getElementById('phoneNumber');
                 if (phoneElement) {
                     phoneElement.textContent = phoneNumber;
+                }
+
+                // Atualizar informações do corretor
+                const brokerElement = document.getElementById('brokerInfo');
+                if (brokerElement) {
+                    brokerElement.textContent = `${brokerName} - CRECI ${creciNumber}`;
+                }
+
+                // Atualizar horário de atendimento
+                const businessHoursElement = document.getElementById('businessHours');
+                if (businessHoursElement) {
+                    businessHoursElement.innerHTML = businessHours.replace(/\n/g, '<br>');
                 }
 
                 // Configurar link de telefone

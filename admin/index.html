@@ -542,7 +542,7 @@
     </div>
 
     <script type="module">
-        import { authManager, propertyManager, utils } from '../shared/supabase-client.js';
+        import { authManager, propertyManager, utils, supabase } from '../shared/supabase-client.js';
         // Auth guard antigo removido - usando versão corrigida
 
         let currentUser = null;
@@ -592,17 +592,45 @@
         // Carregar estatísticas
         async function loadStats() {
             try {
-                const result = await propertyManager.getUserStats();
-                
-                if (result.success && result.data) {
-                    const stats = result.data;
-                    document.getElementById('totalProperties').textContent = stats.total_properties || 0;
-                    document.getElementById('publishedProperties').textContent = stats.published_properties || 0;
-                    document.getElementById('totalScenes').textContent = stats.total_scenes || 0;
-                    document.getElementById('totalHotspots').textContent = stats.total_hotspots || 0;
-                }
+                console.log('🔍 Carregando estatísticas com novo método...');
+                // Calcular estatísticas diretamente para evitar inconsistências
+                const { data: properties, error: propError } = await supabase
+                    .from('properties')
+                    .select('id, status');
+
+                if (propError) throw propError;
+
+                const { data: scenes, error: sceneError } = await supabase
+                    .from('scenes')
+                    .select('id');
+
+                if (sceneError) throw sceneError;
+
+                const { data: hotspots, error: hotspotError } = await supabase
+                    .from('hotspots')
+                    .select('id');
+
+                if (hotspotError) throw hotspotError;
+
+                // Calcular estatísticas
+                const totalProperties = properties.length;
+                const publishedProperties = properties.filter(p => p.status === 'published').length;
+                const totalScenes = scenes.length;
+                const totalHotspots = hotspots.length;
+
+                // Atualizar interface
+                document.getElementById('totalProperties').textContent = totalProperties;
+                document.getElementById('publishedProperties').textContent = publishedProperties;
+                document.getElementById('totalScenes').textContent = totalScenes;
+                document.getElementById('totalHotspots').textContent = totalHotspots;
+
             } catch (error) {
                 console.error('Erro ao carregar estatísticas:', error);
+                // Fallback para valores padrão
+                document.getElementById('totalProperties').textContent = '0';
+                document.getElementById('publishedProperties').textContent = '0';
+                document.getElementById('totalScenes').textContent = '0';
+                document.getElementById('totalHotspots').textContent = '0';
             }
         }
 

@@ -11,7 +11,10 @@
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- Tema Minimalista -->
+    <link rel="stylesheet" href="shared/minimalist-theme.css">
+
     <style>
         :root {
             --primary-gold: #D4AF37;
@@ -129,22 +132,15 @@
             transform: translateY(-2px);
         }
 
-        /* Hero Section */
+        /* Hero Section - Design Minimalista */
         .hero {
             height: 100vh;
-            background: linear-gradient(135deg,
-                        rgba(26, 35, 126, 0.95) 0%,
-                        rgba(74, 144, 226, 0.9) 50%,
-                        rgba(183, 149, 11, 0.85) 100%),
-                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="%23ffffff" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="1200" height="800" fill="%23f8f9fa"/><rect width="1200" height="800" fill="url(%23grid)"/></svg>');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background: var(--color-white);
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            color: white;
+            color: var(--color-black);
             position: relative;
             overflow: hidden;
         }
@@ -156,15 +152,45 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 80%, rgba(183, 149, 11, 0.2) 0%, transparent 50%);
+            background:
+                /* Formas geométricas minimalistas */
+                radial-gradient(circle at 15% 25%, rgba(183, 149, 11, 0.08) 0%, transparent 30%),
+                radial-gradient(circle at 85% 75%, rgba(183, 149, 11, 0.06) 0%, transparent 25%),
+                /* Grid sutil */
+                linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px),
+                linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
+            background-size:
+                600px 600px,
+                400px 400px,
+                60px 60px,
+                60px 60px;
+            background-position:
+                -150px -100px,
+                calc(100% + 100px) calc(100% + 50px),
+                0 0,
+                0 0;
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 10%;
+            transform: translateY(-50%);
+            width: 200px;
+            height: 200px;
+            border: 1px solid rgba(183, 149, 11, 0.2);
+            border-radius: 50%;
             pointer-events: none;
         }
 
         .hero-content {
-            max-width: 800px;
-            padding: 0 30px;
+            max-width: 900px;
+            padding: 0 var(--space-8);
             animation: fadeInUp 1s ease-out;
+            position: relative;
+            z-index: 2;
         }
 
         @keyframes fadeInUp {
@@ -179,68 +205,81 @@
         }
 
         .hero h1 {
-            font-family: 'Playfair Display', serif;
+            font-family: var(--font-display);
             font-size: clamp(3rem, 5vw, 4.5rem);
-            font-weight: 600;
-            margin-bottom: 20px;
-            line-height: 1.2;
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-6);
+            line-height: 1.1;
+            color: var(--color-black);
+            letter-spacing: -0.02em;
         }
 
         .hero p {
-            font-size: 1.3rem;
-            margin-bottom: 40px;
-            opacity: 0.9;
-            font-weight: 300;
+            font-family: var(--font-primary);
+            font-size: var(--text-xl);
+            margin-bottom: var(--space-10);
+            color: var(--color-gray-700);
+            font-weight: var(--font-normal);
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .cta-buttons {
             display: flex;
-            gap: 20px;
+            gap: var(--space-6);
             justify-content: center;
             flex-wrap: wrap;
+            margin-top: var(--space-2);
         }
 
-        .btn-primary {
-            background: var(--primary-gold);
-            color: var(--primary-dark);
-            padding: 15px 35px;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        /* Sobrescrever estilos dos botões para a hero */
+        .hero .btn-primary {
+            background-color: var(--color-gold);
+            color: var(--color-white);
+            border: 2px solid var(--color-gold);
+            padding: var(--space-4) var(--space-8);
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-gold);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: white;
-            padding: 15px 35px;
-            border: 2px solid white;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 16px;
+            gap: var(--space-2);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
+        }
+
+        .hero .btn-primary:hover {
+            background-color: var(--color-gold-dark);
+            border-color: var(--color-gold-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl), var(--shadow-gold);
+        }
+
+        .hero .btn-secondary {
+            background-color: transparent;
+            color: var(--color-black);
+            border: 2px solid var(--color-gray-300);
+            padding: var(--space-4) var(--space-8);
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            border-radius: var(--radius-full);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--space-2);
+            cursor: pointer;
+            transition: all var(--transition-normal);
         }
 
-        .btn-secondary:hover {
-            background: white;
-            color: var(--primary-dark);
-            transform: translateY(-3px);
+        .hero .btn-secondary:hover {
+            background-color: var(--color-gray-50);
+            border-color: var(--color-gray-400);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         /* View All Button */
@@ -946,11 +985,11 @@
             <p>Explore imóveis exclusivos com expertise profissional e tours virtuais 360° de alta qualidade</p>
             
             <div class="cta-buttons">
-                <a href="#properties" class="btn-primary">
+                <a href="properties.html" class="btn-primary">
                     <i class="fas fa-play"></i>
                     Explorar Tours
                 </a>
-                <a href="#contact" class="btn-secondary">
+                <a href="#" class="btn-secondary" id="contactSpecialistBtn">
                     <i class="fas fa-phone"></i>
                     Falar com Especialista
                 </a>
@@ -1127,12 +1166,6 @@
                         <a href="#about">Sobre</a>
                         <a href="#contact">Contato</a>
                     </div>
-                    <div class="footer-column">
-                        <h4>Suporte</h4>
-                        <a href="#">Central de Ajuda</a>
-                        <a href="#">Termos de Uso</a>
-                        <a href="#">Privacidade</a>
-                    </div>
                 </div>
 
                 <div class="footer-social">
@@ -1160,6 +1193,46 @@
         const SUPABASE_URL = 'https://ewivsujoqdnltdktkyvh.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3aXZzdWpvcWRubHRka3RreXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNjIwMzAsImV4cCI6MjA3MjkzODAzMH0.qcSgD6XCJvVj1UsltzvqXeHEBU0fMHB9e25CID4M9Yo';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Configurar redes sociais
+        function configureSocialMedia(config) {
+            const socialLinks = document.querySelectorAll('.social-links a');
+
+            // URLs das redes sociais (usar configuração ou padrão)
+            const socialUrls = {
+                facebook: config.facebook_url || '#',
+                instagram: config.instagram_url || '#',
+                linkedin: config.linkedin_url || '#',
+                youtube: config.youtube_url || '#'
+            };
+
+            socialLinks.forEach(link => {
+                const icon = link.querySelector('i');
+                if (icon) {
+                    if (icon.classList.contains('fa-facebook')) {
+                        link.href = socialUrls.facebook;
+                        if (socialUrls.facebook === '#') {
+                            link.style.display = 'none';
+                        }
+                    } else if (icon.classList.contains('fa-instagram')) {
+                        link.href = socialUrls.instagram;
+                        if (socialUrls.instagram === '#') {
+                            link.style.display = 'none';
+                        }
+                    } else if (icon.classList.contains('fa-linkedin')) {
+                        link.href = socialUrls.linkedin;
+                        if (socialUrls.linkedin === '#') {
+                            link.style.display = 'none';
+                        }
+                    } else if (icon.classList.contains('fa-youtube')) {
+                        link.href = socialUrls.youtube;
+                        if (socialUrls.youtube === '#') {
+                            link.style.display = 'none';
+                        }
+                    }
+                }
+            });
+        }
 
         // Load site settings
         async function loadSiteSettings() {
@@ -1254,6 +1327,9 @@
                     const footerDesc = document.querySelector('footer .company-description');
                     if (footerDesc) footerDesc.textContent = config.footer_description;
                 }
+
+                // Configurar redes sociais
+                configureSocialMedia(config);
 
             } catch (error) {
                 console.error('Erro ao carregar configurações do site:', error);
@@ -1488,6 +1564,17 @@
                         button.rel = 'noopener noreferrer';
                     }
                 });
+
+                // Configurar botão "Falar com Especialista"
+                const contactSpecialistBtn = document.getElementById('contactSpecialistBtn');
+                if (contactSpecialistBtn) {
+                    const specialistMessage = encodeURIComponent('Olá! Gostaria de falar com um especialista sobre os serviços da ValorExpert.');
+                    const specialistUrl = `https://wa.me/${whatsappNumber}?text=${specialistMessage}`;
+
+                    contactSpecialistBtn.href = specialistUrl;
+                    contactSpecialistBtn.target = '_blank';
+                    contactSpecialistBtn.rel = 'noopener noreferrer';
+                }
 
             } catch (error) {
                 console.error('Erro ao inicializar WhatsApp:', error);
