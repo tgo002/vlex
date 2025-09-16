@@ -608,7 +608,7 @@
             }
 
             container.innerHTML = properties.map(property => `
-                <div class="property-card" onclick="window.location.href='property-details.html?id=${property.id}'">
+                <div class="property-card" onclick="window.location.href='/property-details.html?id=${property.id}'">
                     <div class="property-image">
                         <img src="${property.main_image_url || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500'}" 
                              alt="${property.title}" 
@@ -638,7 +638,7 @@
                             </div>
                         </div>
                         <div class="property-actions">
-                            <a href="property-details.html?id=${property.id}" class="btn-details">
+                            <a href="/property-details.html?id=${property.id}" class="btn-details">
                                 <i class="fas fa-info-circle"></i>
                                 Ver Detalhes
                             </a>
