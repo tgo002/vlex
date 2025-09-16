@@ -406,6 +406,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script type="module">
+        // Aguardar carregamento do Supabase
+        while (typeof window.supabase === 'undefined') {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
         import { authManager, propertyManager, sceneManager, utils } from '/shared/supabase-client.js';
         import { ImageUploader } from '/shared/image-uploader.js';
         import '/admin/auth-guard-fixed.js';
