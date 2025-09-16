@@ -9,6 +9,7 @@
     { "source": "/admin/gallery-manager/", "destination": "/admin/gallery-manager.html" },
     { "source": "/admin/hotspot-editor/", "destination": "/admin/hotspot-editor.html" },
     { "source": "/client/tour/", "destination": "/client/tour.html" },
+    { "source": "/properties/", "destination": "/properties.html" },
     { "source": "/property-details/", "destination": "/property-details.html" },
     { "source": "/admin/", "destination": "/admin/index.html" }
   ],

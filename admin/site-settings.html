@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações do Site - Sistema de Tours Virtuais 360°</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            padding: 8px 15px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-title {
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .page-title p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .settings-grid {
+            display: grid;
+            gap: 30px;
+        }
+
+        .settings-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn-save {
+            background: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-save:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e9ecef;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                height: auto;
+                padding: 15px 0;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span>⚙️</span>
+                Configurações do Site
+            </div>
+            <div class="user-menu">
+                <a href="index.html" class="back-btn">
+                    ← Voltar ao Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-title">
+            <h1>⚙️ Configurações do Site</h1>
+            <p>Personalize textos, contatos e informações da sua imobiliária</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div id="loadingContainer" class="loading">
+            <div class="spinner"></div>
+            <p>Carregando configurações...</p>
+        </div>
+
+        <div id="settingsContainer" class="settings-grid" style="display: none;">
+            <!-- Informações da Empresa -->
+            <div class="settings-section">
+                <h2 class="section-title">
+                    🏢 Informações da Empresa
+                </h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="company_name">Nome da Empresa</label>
+                        <input type="text" id="company_name" placeholder="Ex: ValorExpert Imóveis">
+                        <div class="help-text">Nome que aparece no site e rodapé</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="creci_number">Número do CRECI</label>
+                        <input type="text" id="creci_number" placeholder="Ex: CRECI-SP 123456">
+                        <div class="help-text">Obrigatório para imobiliárias no Brasil</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="address">Endereço</label>
+                    <input type="text" id="address" placeholder="Ex: São Paulo, SP - Brasil">
+                </div>
+            </div>
+
+            <!-- Textos da Página Inicial -->
+            <div class="settings-section">
+                <h2 class="section-title">
+                    📝 Textos da Página Inicial
+                </h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="site_title">Título do Site</label>
+                        <input type="text" id="site_title" placeholder="Ex: ValorExpert">
+                    </div>
+                    <div class="form-group">
+                        <label for="site_subtitle">Subtítulo</label>
+                        <input type="text" id="site_subtitle" placeholder="Ex: Avaliação Imobiliária Premium">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="hero_title">Título Principal (Hero)</label>
+                    <input type="text" id="hero_title" placeholder="Ex: Avaliação Imobiliária Premium">
+                </div>
+                <div class="form-group">
+                    <label for="hero_description">Descrição Principal</label>
+                    <textarea id="hero_description" placeholder="Ex: Explore imóveis exclusivos com expertise profissional..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hero_button1_text">Texto do Botão 1 (Hero)</label>
+                        <input type="text" id="hero_button1_text" placeholder="Ex: Explorar Tours">
+                    </div>
+                    <div class="form-group">
+                        <label for="hero_button2_text">Texto do Botão 2 (Hero)</label>
+                        <input type="text" id="hero_button2_text" placeholder="Ex: Falar com Especialista">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="properties_section_title">Título da Seção de Imóveis</label>
+                    <input type="text" id="properties_section_title" placeholder="Ex: Imóveis Exclusivos">
+                </div>
+                <div class="form-group">
+                    <label for="properties_section_description">Descrição da Seção de Imóveis</label>
+                    <textarea id="properties_section_description" placeholder="Ex: Descubra nossa seleção curada de imóveis premium..."></textarea>
+                </div>
+            </div>
+
+            <!-- Informações de Contato -->
+            <div class="settings-section">
+                <h2 class="section-title">
+                    📞 Informações de Contato
+                </h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone_number">Telefone Principal</label>
+                        <input type="text" id="phone_number" placeholder="Ex: +55 (11) 9999-9999">
+                    </div>
+                    <div class="form-group">
+                        <label for="whatsapp_number">WhatsApp (formato internacional)</label>
+                        <input type="text" id="whatsapp_number" placeholder="Ex: 5511999999999">
+                        <div class="help-text">Formato: código do país + DDD + número (sem espaços)</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email de Contato</label>
+                    <input type="email" id="email" placeholder="Ex: contato@tours360.com">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="broker_name">Nome do Corretor Responsável</label>
+                        <input type="text" id="broker_name" placeholder="Ex: João Silva">
+                    </div>
+                    <div class="form-group">
+                        <label for="business_hours">Horário de Atendimento</label>
+                        <textarea id="business_hours" placeholder="Ex: Segunda a Sexta: 8h às 18h&#10;Sábado: 8h às 14h" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção Sobre -->
+            <div class="settings-section">
+                <h2 class="section-title">
+                    ℹ️ Seção Sobre
+                </h2>
+                <div class="form-group">
+                    <label for="about_title">Título da Seção Sobre</label>
+                    <input type="text" id="about_title" placeholder="Ex: Expertise e Tecnologia em Avaliação Imobiliária">
+                </div>
+                <div class="form-group">
+                    <label for="about_description">Descrição da Seção Sobre</label>
+                    <textarea id="about_description" placeholder="Ex: Revolucionamos a forma como você explora e avalia imóveis..."></textarea>
+                </div>
+            </div>
+
+            <!-- Redes Sociais -->
+            <div class="settings-section">
+                <h2 class="section-title">
+                    📱 Redes Sociais
+                </h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="facebook_url">Facebook</label>
+                        <input type="url" id="facebook_url" placeholder="Ex: https://facebook.com/suaempresa">
+                        <div class="help-text">URL completa do Facebook (deixe vazio para ocultar)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="instagram_url">Instagram</label>
+                        <input type="url" id="instagram_url" placeholder="Ex: https://instagram.com/suaempresa">
+                        <div class="help-text">URL completa do Instagram (deixe vazio para ocultar)</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="linkedin_url">LinkedIn</label>
+                        <input type="url" id="linkedin_url" placeholder="Ex: https://linkedin.com/company/suaempresa">
+                        <div class="help-text">URL completa do LinkedIn (deixe vazio para ocultar)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="youtube_url">YouTube</label>
+                        <input type="url" id="youtube_url" placeholder="Ex: https://youtube.com/c/suaempresa">
+                        <div class="help-text">URL completa do YouTube (deixe vazio para ocultar)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rodapé -->
+            <div class="settings-section">
+                <h2 class="section-title">
+                    🦶 Rodapé
+                </h2>
+                <div class="form-group">
+                    <label for="footer_description">Descrição no Rodapé</label>
+                    <textarea id="footer_description" placeholder="Ex: Avaliação imobiliária premium com expertise e tecnologia"></textarea>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <button id="saveBtn" class="btn-save">
+                    <span>💾</span>
+                    Salvar Configurações
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // Configuração do Supabase
+        const SUPABASE_URL = 'https://ewivsujoqdnltdktkyvh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3aXZzdWpvcWRubHRka3RreXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNjIwMzAsImV4cCI6MjA3MjkzODAzMH0.qcSgD6XCJvVj1UsltzvqXeHEBU0fMHB9e25CID4M9Yo';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let settings = {};
+
+        // Carregar configurações
+        async function loadSettings() {
+            try {
+                const { data, error } = await supabase
+                    .from('site_settings')
+                    .select('*');
+
+                if (error) {
+                    throw error;
+                }
+
+                // Converter array para objeto
+                settings = {};
+                data.forEach(setting => {
+                    settings[setting.setting_key] = setting.setting_value;
+                });
+
+                // Preencher formulário
+                Object.keys(settings).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.value = settings[key] || '';
+                    }
+                });
+
+                document.getElementById('loadingContainer').style.display = 'none';
+                document.getElementById('settingsContainer').style.display = 'block';
+
+            } catch (error) {
+                console.error('Erro ao carregar configurações:', error);
+                showAlert('Erro ao carregar configurações: ' + error.message, 'error');
+                document.getElementById('loadingContainer').style.display = 'none';
+            }
+        }
+
+        // Salvar configurações
+        async function saveSettings() {
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span>⏳</span> Salvando...';
+
+            try {
+                const formData = {
+                    company_name: document.getElementById('company_name').value,
+                    creci_number: document.getElementById('creci_number').value,
+                    address: document.getElementById('address').value,
+                    site_title: document.getElementById('site_title').value,
+                    site_subtitle: document.getElementById('site_subtitle').value,
+                    hero_title: document.getElementById('hero_title').value,
+                    hero_description: document.getElementById('hero_description').value,
+                    hero_button1_text: document.getElementById('hero_button1_text').value,
+                    hero_button2_text: document.getElementById('hero_button2_text').value,
+                    properties_section_title: document.getElementById('properties_section_title').value,
+                    properties_section_description: document.getElementById('properties_section_description').value,
+                    phone_number: document.getElementById('phone_number').value,
+                    whatsapp_number: document.getElementById('whatsapp_number').value,
+                    email: document.getElementById('email').value,
+                    broker_name: document.getElementById('broker_name').value,
+                    business_hours: document.getElementById('business_hours').value,
+                    about_title: document.getElementById('about_title').value,
+                    about_description: document.getElementById('about_description').value,
+                    footer_description: document.getElementById('footer_description').value,
+                    facebook_url: document.getElementById('facebook_url').value,
+                    instagram_url: document.getElementById('instagram_url').value,
+                    linkedin_url: document.getElementById('linkedin_url').value,
+                    youtube_url: document.getElementById('youtube_url').value
+                };
+
+                // Atualizar cada configuração
+                for (const [key, value] of Object.entries(formData)) {
+                    const { error } = await supabase
+                        .from('site_settings')
+                        .upsert({
+                            setting_key: key,
+                            setting_value: value,
+                            updated_at: new Date().toISOString()
+                        }, {
+                            onConflict: 'setting_key'
+                        });
+
+                    if (error) {
+                        throw error;
+                    }
+                }
+
+                showAlert('Configurações salvas com sucesso!', 'success');
+
+            } catch (error) {
+                console.error('Erro ao salvar configurações:', error);
+                showAlert('Erro ao salvar configurações: ' + error.message, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<span>💾</span> Salvar Configurações';
+            }
+        }
+
+        // Mostrar alerta
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = `
+                <div class="alert ${type}">
+                    ${message}
+                </div>
+            `;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // Event listeners
+        document.getElementById('saveBtn').addEventListener('click', saveSettings);
+
+        // Inicializar
+        loadSettings();
+    </script>
+
+    <!-- Auth Guard -->
+    <script src="auth-guard-fixed.js"></script>
+</body>
+</html>

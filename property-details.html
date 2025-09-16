@@ -1297,7 +1297,7 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
     <script type="module">
-        import { utils } from '/shared/supabase-client.js';
+        import { utils } from './shared/supabase-client.js';
 
         let currentProperty = null;
         let galleryImages = [];
@@ -1339,7 +1339,7 @@
         async function loadProperty() {
             try {
                 // Import supabase client
-                const { supabase } = await import('/shared/supabase-client.js');
+                const { supabase } = await import('./shared/supabase-client.js');
 
                 // Carregar dados da propriedade
                 // Tenta carregar como publicado; se não existir (406), faz fallback para qualquer status (preview/admin)
@@ -1614,7 +1614,7 @@
         async function initWhatsApp() {
             try {
                 // Import supabase client
-                const { supabase } = await import('/shared/supabase-client.js');
+                const { supabase } = await import('./shared/supabase-client.js');
 
                 // Buscar configurações do Supabase
                 const { data: settings, error } = await supabase

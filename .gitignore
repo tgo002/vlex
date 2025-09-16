@@ -79,9 +79,15 @@ uploads/
 !sample-*.jpg
 !sample-*.png
 
-# Original files (now in public directory)
-/admin/
-/client/
-/shared/
-/*.html
-/tour-config.json
+# Arquivos temporários de desenvolvimento (manter apenas arquivos de teste e temporários)
+# /admin/
+# /client/
+# /shared/
+# /*.html
+# /tour-config.json
+
+# Manter apenas arquivos realmente temporários ignorados
+*.tmp.html
+*.backup.html
+test-*.html
+temp-*
