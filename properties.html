@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos os Imóveis - ValorExpert</title>
+    <meta name="description" content="Explore todos os nossos imóveis exclusivos com tours virtuais 360° de alta qualidade.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-gold: #D4AF37;
+            --primary-dark: #1a1a1a;
+            --primary-blue: #0f1419;
+            --text-light: #666;
+            --text-dark: #333;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --border-light: #e9ecef;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--light-gray);
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-gold);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-menu a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary-gold);
+        }
+
+        .back-btn {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+
+
+        .btn-filter {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-clear {
+            background: transparent;
+            color: var(--text-light);
+            padding: 12px 25px;
+            border: 2px solid var(--border-light);
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-clear:hover {
+            border-color: var(--primary-gold);
+            color: var(--primary-gold);
+        }
+
+        /* Properties Grid */
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .property-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .property-image {
+            position: relative;
+            height: 250px;
+            background: var(--light-gray);
+            overflow: hidden;
+        }
+
+        .property-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .property-card:hover .property-image img {
+            transform: scale(1.05);
+        }
+
+        .tour-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .property-content {
+            padding: 25px;
+        }
+
+        .property-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-gold);
+            margin-bottom: 10px;
+        }
+
+        .property-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        .property-description {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .property-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .feature i {
+            color: var(--primary-gold);
+            width: 16px;
+        }
+
+        .property-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-details {
+            flex: 1;
+            background: transparent;
+            color: var(--primary-gold);
+            padding: 12px;
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-details:hover {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+        }
+
+        .btn-tour {
+            flex: 1;
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-tour:hover {
+            background: #c49b2e;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-light);
+            border-top: 4px solid var(--primary-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary-blue);
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand .logo {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-brand p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .footer-column h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-gold);
+        }
+
+        .footer-column a {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--primary-gold);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-menu {
+                gap: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+
+
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <i class="fas fa-chart-line"></i>
+                ValorExpert
+            </a>
+            
+            <nav class="nav-menu">
+                <a href="index.html#properties">Imóveis</a>
+                <a href="index.html#about">Sobre</a>
+                <a href="index.html#contact">Contato</a>
+            </nav>
+            
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Voltar ao Início
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Todos os Imóveis</h1>
+            <p>Explore nossa coleção completa de imóveis exclusivos com tours virtuais 360° de alta qualidade</p>
+        </div>
+
+
+
+        <!-- Properties Grid -->
+        <div id="propertiesGrid" class="properties-grid">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Carregando todos os imóveis...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="/index.html" class="logo">
+                        <i class="fas fa-chart-line"></i>
+                        ValorExpert
+                    </a>
+                    <p>Avaliação imobiliária premium com expertise e tecnologia</p>
+                </div>
+
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Navegação</h4>
+                        <a href="/index.html#properties">Imóveis</a>
+                        <a href="/index.html#about">Sobre</a>
+                        <a href="/index.html#contact">Contato</a>
+                    </div>
+                </div>
+
+                <div class="footer-social">
+                    <h4>Redes Sociais</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 ValorExpert. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+    <script type="module">
+        import { supabase } from './shared/supabase-client.js';
+
+        let allProperties = [];
+
+        // Carregar todos os imóveis
+        async function loadAllProperties() {
+            try {
+                console.log('Carregando todos os imóveis...');
+                
+                const { data: properties, error } = await supabase
+                    .from('properties')
+                    .select('*')
+                    .eq('status', 'published')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.warn('Supabase indisponível, usando dados de exemplo:', error);
+                    displaySampleProperties();
+                    return;
+                }
+
+                // Buscar contagem de cenas para cada propriedade
+                const propertiesWithScenes = await Promise.all(
+                    properties.map(async (property) => {
+                        try {
+                            const { count } = await supabase
+                                .from('scenes')
+                                .select('*', { count: 'exact', head: true })
+                                .eq('property_id', property.id);
+                            
+                            return { ...property, scene_count: count || 0 };
+                        } catch (error) {
+                            console.warn(`Erro ao buscar cenas para propriedade ${property.id}:`, error);
+                            return { ...property, scene_count: 0 };
+                        }
+                    })
+                );
+
+                allProperties = propertiesWithScenes;
+                displayProperties(allProperties);
+                
+            } catch (error) {
+                console.error('Erro ao carregar imóveis:', error);
+                displaySampleProperties();
+            }
+        }
+
+        // Exibir propriedades de exemplo
+        function displaySampleProperties() {
+            const sampleProperties = [
+                {
+                    id: 'sample-1',
+                    title: 'Apartamento Moderno no Centro',
+                    description: 'Apartamento completamente reformado com acabamentos de primeira linha.',
+                    price: 450000,
+                    area: 85,
+                    bedrooms: 2,
+                    bathrooms: 2,
+                    property_type: 'apartamento',
+                    main_image_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500',
+                    scene_count: 5
+                },
+                {
+                    id: 'sample-2',
+                    title: 'Casa em Condomínio Fechado',
+                    description: 'Casa espaçosa com jardim e área de lazer completa.',
+                    price: 750000,
+                    area: 180,
+                    bedrooms: 3,
+                    bathrooms: 3,
+                    property_type: 'casa',
+                    main_image_url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500',
+                    scene_count: 8
+                }
+            ];
+            
+            allProperties = sampleProperties;
+            displayProperties(allProperties);
+        }
+
+        // Exibir propriedades
+        function displayProperties(properties) {
+            const container = document.getElementById('propertiesGrid');
+            
+            if (properties.length === 0) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <p>Nenhum imóvel encontrado com os filtros selecionados.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = properties.map(property => `
+                <div class="property-card" onclick="window.location.href='property-details.html?id=${property.id}'">
+                    <div class="property-image">
+                        <img src="${property.main_image_url || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500'}" 
+                             alt="${property.title}" 
+                             onerror="this.src='https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500'">
+                        <div class="tour-badge">Tour 360°</div>
+                    </div>
+                    <div class="property-content">
+                        <div class="property-price">R$ ${Number(property.price).toLocaleString('pt-BR')}</div>
+                        <h3 class="property-title">${property.title}</h3>
+                        <p class="property-description">${property.description}</p>
+                        <div class="property-features">
+                            <div class="feature">
+                                <i class="fas fa-bed"></i>
+                                <span>${property.bedrooms} quartos</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-bath"></i>
+                                <span>${property.bathrooms} banheiros</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-ruler-combined"></i>
+                                <span>${property.area}m²</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-camera"></i>
+                                <span>${property.scene_count} cenas</span>
+                            </div>
+                        </div>
+                        <div class="property-actions">
+                            <a href="property-details.html?id=${property.id}" class="btn-details">
+                                <i class="fas fa-info-circle"></i>
+                                Ver Detalhes
+                            </a>
+                            <a href="/client/tour.html?id=${property.id}" class="btn-tour">
+                                <i class="fas fa-play"></i>
+                                Tour 360°
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+
+
+        // Inicializar
+        loadAllProperties();
+    </script>
+</body>
+</html>
