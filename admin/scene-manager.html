@@ -415,7 +415,7 @@
 
         await waitForSupabase();
 
-        const { authManager, propertyManager, sceneManager, utils } = await import('/shared/supabase-client.js');
+        const { authManager, propertyManager, sceneManager, utils, supabase } = await import('/shared/supabase-client.js');
         import { ImageUploader } from '/shared/image-uploader.js';
         import '/admin/auth-guard-fixed.js';
 
@@ -670,31 +670,52 @@
             }
         };
 
-        // Excluir cena
+        // Excluir cena (com remoção de hotspots relacionados para evitar erro de FK)
         window.deleteScene = async function(sceneId) {
             if (!confirm('Tem certeza que deseja excluir esta cena? Esta ação não pode ser desfeita.')) {
                 return;
             }
 
             try {
+                // 1) Remover hotspots que pertencem à cena
+                const del1 = await supabase.from('hotspots').delete().eq('scene_id', sceneId);
+                if (del1.error) throw del1.error;
+
+                // 2) Remover hotspots que apontam para esta cena
+                const del2 = await supabase.from('hotspots').delete().eq('target_scene_id', sceneId);
+                if (del2.error) throw del2.error;
+
+                // 3) Remover a cena
                 const result = await sceneManager.deleteScene(sceneId);
-                
-                if (result.success) {
-                    showAlert('Cena excluída com sucesso!', 'success');
-                    await loadScenes();
-                } else {
-                    showAlert(`Erro ao excluir cena: ${result.error}`, 'error');
-                }
+                if (!result.success) throw new Error(result.error || 'Falha ao excluir cena');
+
+                showAlert('Cena excluída com sucesso!', 'success');
+                await loadScenes();
             } catch (error) {
-                console.error('Erro ao excluir cena:', error);
-                showAlert('Erro ao excluir cena.', 'error');
+                console.error('Erro ao excluir cena (cascade):', error);
+                showAlert(`Erro ao excluir cena: ${error.message || error}`, 'error');
             }
         };
 
-        // Editar cena
-        window.editScene = function(sceneId) {
-            // Implementar modal de edição ou redirecionar para página de edição
-            alert('Funcionalidade de edição será implementada em breve!');
+        // Editar cena (alterar título)
+        window.editScene = async function(sceneId) {
+            const current = scenes.find(s => s.id === sceneId);
+            const newTitle = prompt('Digite o novo nome da cena:', current?.title || '');
+            if (newTitle === null) return; // cancelado
+            const title = newTitle.trim();
+            if (!title) {
+                showAlert('O nome da cena não pode ser vazio.', 'warning');
+                return;
+            }
+            try {
+                const result = await sceneManager.updateScene(sceneId, { title });
+                if (!result.success) throw new Error(result.error || 'Falha ao atualizar cena');
+                showAlert('Nome da cena atualizado com sucesso!', 'success');
+                await loadScenes();
+            } catch (e) {
+                console.error('Erro ao atualizar cena:', e);
+                showAlert(`Erro ao atualizar cena: ${e.message || e}`, 'error');
+            }
         };
 
         // Preview da cena

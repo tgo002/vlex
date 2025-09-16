@@ -822,23 +822,10 @@
             </button>
         </div>
 
-        <!-- Property Info Panel -->
-        <div class="property-info" id="propertyInfo">
-            <h1 class="property-title" id="propertyTitle">Carregando...</h1>
-            <p class="property-description" id="propertyDescription">Preparando informações...</p>
-
-            <div class="property-specs" id="propertySpecs">
-                <!-- Será preenchido dinamicamente -->
-            </div>
-
-            <div class="property-actions">
-                <button class="action-btn" onclick="showContactForm()">
-                    📞 Entrar em Contato
-                </button>
-                <button class="action-btn secondary" onclick="shareOnWhatsApp()">
-                    💬 WhatsApp
-                </button>
-            </div>
+        <!-- Contact Minimal -->
+        <div class="contact-minimal" id="contactMinimal" style="position:absolute; top:20px; right:20px; z-index:2000; background: rgba(0,0,0,0.8); color:#fff; padding:10px 14px; border-radius:10px; backdrop-filter: blur(10px); display:flex; align-items:center; gap:10px;">
+            <span id="contactPhone" style="font-weight:600;"></span>
+            <button class="action-btn" style="background:linear-gradient(135deg,#28a745,#218838);" onclick="shareOnWhatsApp()">💬 Contato</button>
         </div>
 
         <!-- Scene Navigator -->
@@ -950,10 +937,10 @@
 
                 updateLoadingProgress(90, 'Finalizando...');
                 updateMetaTags();
-                updatePropertyInfo();
+                // property-info removido do UI
                 updateSceneNavigator();
                 updateContactInfo();
-                initContactForm();
+                // contato simplificado (whatsapp)
                 initSocialShare();
 
                 updateLoadingProgress(100, 'Pronto!');
