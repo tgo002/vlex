@@ -2,7 +2,7 @@
 // Base URL can be overridden by env TOUR_URL
 import { test, expect } from '@playwright/test';
 
-const DEFAULT_TOUR_URL = 'http://localhost:3000/client/tour.html?id=2817c143-4287-4eeb-b89d-96bbd441aecf';
+const DEFAULT_TOUR_URL = 'http://localhost:8000/client/tour.html?id=2817c143-4287-4eeb-b89d-96bbd441aecf';
 const TOUR_URL = process.env.TOUR_URL || DEFAULT_TOUR_URL;
 
 test.describe('Tour UI minimal', () => {

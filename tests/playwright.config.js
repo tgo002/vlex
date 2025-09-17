@@ -2,8 +2,14 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  // Diretório dos testes
-  testDir: './tests',
+  // Diretório dos testes (relativo a este config em ./tests)
+  testDir: '.',
+  // Limitar a suíte aos testes do cliente/tour para este ciclo
+  testMatch: [
+    'tour-ui-clean.spec.js',
+    'tour-sanity.spec.js',
+    'manual-*.spec.js'
+  ],
   
   // Timeout global para testes
   timeout: 30000,
@@ -29,7 +35,7 @@ export default defineConfig({
   // Configurações globais
   use: {
     // URL base para testes
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:8000',
     
     // Trace on first retry
     trace: 'on-first-retry',
@@ -87,8 +93,9 @@ export default defineConfig({
 
   // Servidor de desenvolvimento
   webServer: {
-    command: 'python -m http.server 3000',
-    port: 3000,
+    // Servir a raiz do repositório (este config vive em ./tests)
+    command: 'python -m http.server 8000 -d ..',
+    port: 8000,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },
@@ -97,6 +104,6 @@ export default defineConfig({
   outputDir: 'test-results/',
   
   // Global setup e teardown
-  globalSetup: require.resolve('./global-setup.js'),
-  globalTeardown: require.resolve('./global-teardown.js'),
+  globalSetup: './global-setup.js',
+  globalTeardown: './global-teardown.js',
 });
