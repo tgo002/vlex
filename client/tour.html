@@ -763,6 +763,18 @@
             70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
             100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
         }
+
+        /* Extra fade curtain to enhance scene transitions */
+        .scene-curtain {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            opacity: 0;
+            transition: opacity 300ms ease;
+            pointer-events: none;
+            z-index: 1500;
+        }
+
     </style>
 </head>
 <body>
@@ -799,6 +811,9 @@
         <!-- Panorama Viewer -->
         <div id="panorama"></div>
 
+        <!-- Transition Curtain for extra fade control -->
+        <div id="sceneCurtain" class="scene-curtain" aria-hidden="true"></div>
+
         <!-- Mobile Back Button -->
         <button class="mobile-back-btn" onclick="goBack()" title="Voltar">
             <i class="fas fa-arrow-left"></i>
@@ -825,7 +840,10 @@
         <!-- Contact Minimal -->
         <div class="contact-minimal" id="contactMinimal" style="position:absolute; top:20px; right:20px; z-index:2000; background: rgba(0,0,0,0.8); color:#fff; padding:10px 14px; border-radius:10px; backdrop-filter: blur(10px); display:flex; align-items:center; gap:10px;">
             <span id="contactPhone" style="font-weight:600;"></span>
-            <button class="action-btn" style="background:linear-gradient(135deg,#25D366,#128C7E);" onclick="shareOnWhatsApp()">WhatsApp</button>
+            <button class="action-btn" style="background:linear-gradient(135deg,#25D366,#128C7E); display:flex; align-items:center; gap:8px;" onclick="shareOnWhatsApp()">
+                <svg width="16" height="16" viewBox="0 0 32 32" fill="#fff" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M19.11 17.53c-.27-.13-1.6-.79-1.85-.88-.25-.09-.43-.13-.61.13-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.13-1.15-.42-2.2-1.34-.81-.72-1.36-1.6-1.52-1.86-.16-.27-.02-.41.12-.54.12-.12.27-.32.4-.48.13-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.13-.61-1.47-.84-2.02-.22-.53-.44-.46-.61-.47-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.96.94-.96 2.29s.99 2.66 1.13 2.84c.14.18 1.95 2.98 4.73 4.17.66.28 1.17.45 1.57.58.66.21 1.26.18 1.73.11.53-.08 1.6-.65 1.83-1.27.23-.62.23-1.15.16-1.27-.07-.11-.25-.18-.52-.31z"/><path d="M16.02 3C9.39 3 4.02 8.37 4.02 15c0 2.52.82 4.85 2.21 6.76L4 29l7.42-2.17c1.84 1.01 3.96 1.58 6.2 1.58 6.63 0 12-5.37 12-12S22.65 3 16.02 3zm0 21.62c-1.96 0-3.78-.57-5.3-1.54l-.38-.24-4.42 1.29 1.31-4.31-.25-.44c-1.08-1.58-1.71-3.48-1.71-5.38 0-5.37 4.37-9.74 9.74-9.74s9.74 4.37 9.74 9.74-4.37 9.74-9.74 9.74z"/></svg>
+                <span>WhatsApp</span>
+            </button>
         </div>
 
         <!-- Scene Navigator -->
@@ -869,7 +887,7 @@
 
 	        // Flags de transição suave entre cenas
 	        let firstLoadDone = false;
-	        let pendingZoom = false;
+	        let postLoadZoomOut = null; // controla o zoom-out após mudança de cena
 
 
         // Carregar configurações do site
@@ -1069,27 +1087,41 @@
 
                 // Converter hotspots para formato Pannellum
                 const hotSpots = sceneHotspots.map(hotspot => {
-                    const hotspotConfig = {
+                    const base = {
                         pitch: parseFloat(hotspot.pitch) || 0,
                         yaw: parseFloat(hotspot.yaw) || 0,
-                        type: hotspot.type === 'navigation' ? 'scene' : 'info',
                         text: hotspot.title || 'Hotspot'
                     };
 
                     if (hotspot.type === 'navigation' && hotspot.target_scene_id) {
-                        // Hotspot de navegação
+                        // Hotspot de navegação com transição cinematográfica controlada
                         const targetSceneIndex = scenes.findIndex(s => s.id === hotspot.target_scene_id);
                         if (targetSceneIndex !== -1) {
-                            hotspotConfig.sceneId = `scene${targetSceneIndex + 1}`;
-                            hotspotConfig.targetYaw = parseFloat(hotspot.target_yaw) || 0;
-                            hotspotConfig.targetPitch = parseFloat(hotspot.target_pitch) || 0;
+                            const tSceneId = `scene${targetSceneIndex + 1}`;
+                            const tScene = scenes[targetSceneIndex];
+                            return {
+                                ...base,
+                                type: 'info',
+                                cssClass: 'hotspot-navigation',
+                                clickHandlerFunc: handleNavHotspotClick,
+                                clickHandlerArgs: {
+                                    targetSceneId: tSceneId,
+                                    targetPitch: parseFloat(hotspot.target_pitch) || parseFloat(tScene.initial_pitch) || 0,
+                                    targetYaw: parseFloat(hotspot.target_yaw) || parseFloat(tScene.initial_yaw) || 0,
+                                    targetHfov: parseFloat(tScene.initial_hfov) || 110
+                                }
+                            };
                         }
-                    } else {
-                        // Hotspot informativo
-                        hotspotConfig.URL = `javascript:showHotspotInfo('${hotspot.title}', '${hotspot.description || 'Sem descrição'}')`;
                     }
 
-                    return hotspotConfig;
+                    // Hotspot informativo
+                    return {
+                        ...base,
+                        type: 'info',
+                        cssClass: 'hotspot-info',
+                        URL: `javascript:showHotspotInfo('${hotspot.title}', '${hotspot.description || 'Sem descrição'}')`
+                    };
+                });
                 });
 
                 tourConfig.scenes[sceneId] = {
@@ -1119,18 +1151,21 @@
                 viewer.on('load', () => {
                     console.log('✅ Cena carregada:', currentScene?.title || viewer.getScene());
                     if (!firstLoadDone) { firstLoadDone = true; return; }
-                    if (pendingZoom) {
-                        const tPitch = parseFloat(currentScene?.initial_pitch) || 0;
-                        const tYaw = parseFloat(currentScene?.initial_yaw) || 0;
-                        const tHfov = parseFloat(currentScene?.initial_hfov) || 110;
-                        viewer.setHfov(Math.min(140, tHfov + 20));
-                        setTimeout(() => viewer.lookAt(tPitch, tYaw, tHfov, 1000), 50);
+                    if (postLoadZoomOut) {
+                        const { pitch, yaw, to } = {
+                            pitch: postLoadZoomOut.pitch,
+                            yaw: postLoadZoomOut.yaw,
+                            to: postLoadZoomOut.to
+                        };
+                        setTimeout(() => {
+                            viewer.lookAt(pitch, yaw, to, 900);
+                            showCurtain(false);
+                        }, 60);
+                        postLoadZoomOut = null;
                     }
-                    pendingZoom = false;
                 });
 
                 viewer.on('scenechange', () => {
-                    pendingZoom = true;
                     const currentSceneId = viewer.getScene();
                     console.log('🔄 Mudança de cena para:', currentSceneId);
                 });
@@ -1140,6 +1175,46 @@
                     console.error('Detalhes do erro:', error.message || error);
                     throw new Error('Erro ao carregar visualizador 360°');
                 });
+
+
+                // ===== Helpers para transição cinematográfica (dolly zoom) =====
+                function showCurtain(visible) {
+                    const el = document.getElementById('sceneCurtain');
+                    if (!el) return;
+                    el.style.pointerEvents = visible ? 'auto' : 'none';
+                    el.style.opacity = visible ? '1' : '0';
+                }
+
+                function animateLookAt(pitch, yaw, hfov, duration = 800) {
+                    return new Promise((resolve) => {
+                        const done = () => {
+                            if (viewer?.off) viewer.off('animatefinished', done);
+                            resolve();
+                        };
+                        if (viewer?.on) viewer.on('animatefinished', done);
+                        viewer.lookAt(pitch, yaw, hfov, duration);
+                        // Fallback de segurança caso o evento não dispare
+                        setTimeout(done, duration + 80);
+                    });
+                }
+
+                async function navigateWithDolly(pannSceneId, targetPitch = 0, targetYaw = 0, targetHfov = 110) {
+                    if (!viewer) return;
+                    const preZoomHfov = Math.max(40, viewer.getHfov() - 30);
+                    // 1) Aproximar na direção clicada
+                    await animateLookAt(targetPitch, targetYaw, preZoomHfov, 800);
+                    // 2) Fade suave
+                    showCurtain(true);
+                    // 3) Trocar de cena com HFOV inicial mais fechado
+                    postLoadZoomOut = { pitch: targetPitch, yaw: targetYaw, from: Math.max(40, targetHfov - 30), to: targetHfov };
+                    viewer.loadScene(pannSceneId, targetPitch, targetYaw, postLoadZoomOut.from);
+                    // 4) O zoom-out final acontece no handler de 'load'
+                }
+
+                function handleNavHotspotClick(_, args) {
+                    if (!args || !args.targetSceneId) return;
+                    navigateWithDolly(args.targetSceneId, args.targetPitch, args.targetYaw, args.targetHfov);
+                }
 
             } catch (error) {
                 console.error('❌ Erro ao criar viewer:', error);
@@ -1375,12 +1450,11 @@
             const targetIndex = scenes.findIndex(s => s.id === sceneId);
             const pannellumSceneId = targetIndex >= 0 ? `scene${targetIndex + 1}` : null;
             if (pannellumSceneId) {
-                pendingZoom = true;
-                viewer.loadScene(
+                navigateWithDolly(
                     pannellumSceneId,
-                    newScene.initial_pitch || 0,
-                    newScene.initial_yaw || 0,
-                    Math.min(140, (newScene.initial_hfov || 110) + 20)
+                    parseFloat(newScene.initial_pitch) || 0,
+                    parseFloat(newScene.initial_yaw) || 0,
+                    parseFloat(newScene.initial_hfov) || 110
                 );
             }
         };
