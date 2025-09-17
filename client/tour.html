@@ -871,6 +871,8 @@
 	        let firstLoadDone = false;
 	        let pendingZoom = false;
 
+        let dollyInProgress = false;
+
 
         // Carregar configurações do site
         async function loadSiteConfig() {
@@ -1170,6 +1172,13 @@
 
                 viewer.on('load', () => {
                     console.log('✅ Cena carregada:', currentScene?.title || viewer.getScene());
+                    // Reanexar interceptores de hotspots de navegação a cada cena carregada
+                    try { attachNavHotspotDollyInterception(); } catch (e) { console.warn('attachNavHotspotDollyInterception falhou:', e); }
+                    if (dollyInProgress) {
+                        // Transição customizada controla o ajuste final
+                        pendingZoom = false;
+                        return;
+                    }
                     if (!firstLoadDone) { firstLoadDone = true; return; }
                     if (pendingZoom) {
                         const tPitch = parseFloat(currentScene?.initial_pitch) || 0;
@@ -1182,6 +1191,7 @@
                 });
 
                 viewer.on('scenechange', () => {
+                    if (dollyInProgress) { pendingZoom = false; return; }
                     pendingZoom = true;
                     const currentSceneId = viewer.getScene();
                     console.log('🔄 Mudança de cena para:', currentSceneId);
@@ -1198,6 +1208,130 @@
                 throw error;
             }
         }
+
+        // Intercepta cliques em hotspots de navegação (sem alterar hotspots / layout)
+        function attachNavHotspotDollyInterception() {
+            try {
+                if (!viewer) return;
+                const container = document.getElementById('panorama');
+                if (!container) return;
+                const cfg = viewer.getConfig();
+                const currentId = viewer.getScene();
+                const navHotspots = (cfg?.scenes?.[currentId]?.hotSpots || []).filter(h => h.type === 'scene');
+                const els = container.querySelectorAll('.pnlm-hotspot.pnlm-scene');
+                const count = Math.min(navHotspots.length, els.length);
+                for (let i = 0; i < count; i++) {
+                    const el = els[i];
+                    if (el?.dataset?.dollyAttached === '1') continue;
+                    if (el && el.dataset) el.dataset.dollyAttached = '1';
+                    el.addEventListener('click', (ev) => {
+                        try {
+                            const h = navHotspots[i];
+                            if (!h || !h.sceneId) return; // não interferir em hotspots não navegação
+                            // Interceptar navegação padrão
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            if (typeof ev.stopImmediatePropagation === 'function') ev.stopImmediatePropagation();
+                            // Executar transição cinematográfica
+                            runDollyTransition(h).catch(err => {
+                                console.error('Erro na transição dolly:', err);
+                                // Fallback gracioso: navegação padrão
+                                try { viewer.loadScene(h.sceneId); } catch {}
+                            });
+                        } catch (e) {
+                            console.error('Falha ao interceptar hotspot de navegação:', e);
+                        }
+                    }, true); // capture
+                }
+            } catch (e) {
+                console.warn('attachNavHotspotDollyInterception erro:', e);
+            }
+        }
+
+        async function runDollyTransition(h) {
+            if (dollyInProgress) return;
+            dollyInProgress = true;
+            const container = document.getElementById('panorama');
+
+            // Overlay anti-flicker + bloqueio de interação temporária
+            let overlay = document.getElementById('dollyOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'dollyOverlay';
+                Object.assign(overlay.style, {
+                    position: 'absolute',
+                    inset: '0',
+                    background: 'rgba(0,0,0,0.00)',
+                    pointerEvents: 'auto',
+                    zIndex: '5'
+                });
+                container.appendChild(overlay);
+            }
+            overlay.style.display = 'block';
+
+            try {
+                // Pausa auto rotação se estiver ativa (não altera estado visual do botão)
+                const resumeAuto = isAutoRotating === true;
+                if (resumeAuto) { try { viewer.stopAutoRotate(); } catch {}
+                }
+
+                // Fase 1 (300-400ms): Zoom in somente na imagem atual (sem mover yaw/pitch)
+                const curH = viewer.getHfov();
+                const aimH = Math.max(40, curH - 20);
+                const curPitch = viewer.getPitch();
+                const curYaw = viewer.getYaw();
+                viewer.lookAt(curPitch, curYaw, aimH, 380);
+                await new Promise(r => setTimeout(r, 400));
+
+                // Fase 2 (200-300ms): Overlay anti-flicker
+                overlay.style.background = 'rgba(0,0,0,0.02)';
+                await new Promise(r => setTimeout(r, 220));
+
+                // Fase 3 (300-400ms): loadScene + leve zoom out inicial
+                const cfg = viewer.getConfig();
+                const targetCfg = cfg?.scenes?.[h.sceneId] || {};
+                const initPitch = (typeof targetCfg.pitch === 'number') ? targetCfg.pitch : 0;
+                const initYaw = (typeof targetCfg.yaw === 'number') ? targetCfg.yaw : 0;
+                const initHfov = (typeof targetCfg.hfov === 'number') ? targetCfg.hfov : 110;
+                const outHfov = Math.min(140, initHfov + 15);
+
+                // Sinalizar para não aplicar o dolly padrão
+                pendingZoom = false;
+
+                let handled = false;
+                const onLoaded = () => {
+                    if (handled) return; handled = true;
+                    // Fase 4 (200ms): Ajuste final para targetYaw/targetPitch e restaurar HFOV normal
+                    setTimeout(() => {
+                        viewer.lookAt(initPitch, initYaw, initHfov, 380);
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                            overlay.style.background = 'rgba(0,0,0,0.00)';
+                            dollyInProgress = false;
+                            if (resumeAuto) { try { viewer.startAutoRotate(2); } catch {} }
+                        }, 420);
+                    }, 50);
+                };
+                viewer.on('load', onLoaded);
+
+                viewer.loadScene(h.sceneId, initPitch, initYaw, outHfov);
+
+                // Timeout de segurança (fallback)
+                setTimeout(() => {
+                    if (!handled) {
+                        try { onLoaded(); } catch {}
+                    }
+                }, 1500);
+
+            } catch (err) {
+                console.error('Erro na dolly transition:', err);
+                try { overlay.style.display = 'none'; } catch {}
+                dollyInProgress = false;
+                // Fallback: navegação padrão
+                try { viewer.loadScene(h.sceneId); } catch {}
+            }
+        }
+
 
         // Atualizar progresso de carregamento
         function updateLoadingProgress(percentage, text) {
