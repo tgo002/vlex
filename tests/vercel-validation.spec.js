@@ -19,7 +19,7 @@ test.describe('Validação do deploy no Vercel', () => {
         await page.goto(VERCEL_URL);
         
         // Verificar se a página carregou
-        await expect(page).toHaveTitle(/ValorExpert/);
+        await expect(page).toHaveTitle(/ValorXpert/);
         
         // Aguardar carregamento completo
         await page.waitForLoadState('networkidle');

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('ValorExpert - Transformação Completa', () => {
+test.describe('ValorXpert - Transformação Completa', () => {
     test.beforeEach(async ({ page }) => {
         // Configurar interceptação de console para capturar erros
         page.on('console', msg => {
@@ -10,15 +10,15 @@ test.describe('ValorExpert - Transformação Completa', () => {
         });
     });
 
-    test('Deve exibir rebranding ValorExpert na página inicial', async ({ page }) => {
+    test('Deve exibir rebranding ValorXpert na página inicial', async ({ page }) => {
         await page.goto('http://localhost:8000/index.html');
         
         // Verificar título da página
-        await expect(page).toHaveTitle(/ValorExpert/);
+        await expect(page).toHaveTitle(/ValorXpert/);
         
         // Verificar logo no header
         const headerLogo = page.locator('header .logo');
-        await expect(headerLogo).toContainText('ValorExpert');
+        await expect(headerLogo).toContainText('ValorXpert');
         
         // Verificar ícone correto (chart-line)
         const logoIcon = page.locator('header .logo i');
@@ -30,24 +30,24 @@ test.describe('ValorExpert - Transformação Completa', () => {
         
         // Verificar footer
         const footerLogo = page.locator('footer .logo');
-        await expect(footerLogo).toContainText('ValorExpert');
+        await expect(footerLogo).toContainText('ValorXpert');
         
         const footerCopyright = page.locator('.footer-bottom p');
-        await expect(footerCopyright).toContainText('© 2024 ValorExpert');
+        await expect(footerCopyright).toContainText('© 2024 ValorXpert');
     });
 
-    test('Deve exibir rebranding ValorExpert na página de detalhes', async ({ page }) => {
+    test('Deve exibir rebranding ValorXpert na página de detalhes', async ({ page }) => {
         await page.goto('http://localhost:8000/property-details.html?id=a1b2c3d4-e5f6-7890-abcd-ef1234567890');
         
         // Aguardar carregamento
         await page.waitForTimeout(3000);
         
         // Verificar título da página
-        await expect(page).toHaveTitle(/ValorExpert/);
+        await expect(page).toHaveTitle(/ValorXpert/);
         
         // Verificar logo no header
         const headerLogo = page.locator('header .logo');
-        await expect(headerLogo).toContainText('ValorExpert');
+        await expect(headerLogo).toContainText('ValorXpert');
         
         // Verificar ícone correto (chart-line)
         const logoIcon = page.locator('header .logo i');
@@ -55,10 +55,10 @@ test.describe('ValorExpert - Transformação Completa', () => {
         
         // Verificar footer
         const footerLogo = page.locator('footer .logo');
-        await expect(footerLogo).toContainText('ValorExpert');
+        await expect(footerLogo).toContainText('ValorXpert');
         
         const footerCopyright = page.locator('.footer-bottom p');
-        await expect(footerCopyright).toContainText('© 2024 ValorExpert');
+        await expect(footerCopyright).toContainText('© 2024 ValorXpert');
     });
 
     test('Deve exibir hero section moderno com galeria protagonista', async ({ page }) => {

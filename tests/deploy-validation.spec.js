@@ -10,7 +10,7 @@ test.describe('Validação antes do deploy', () => {
         await page.goto('http://localhost:8000');
         
         // Verificar se a página carregou
-        await expect(page).toHaveTitle(/ValorExpert/);
+        await expect(page).toHaveTitle(/ValorXpert/);
         
         // Verificar se não há erros de console críticos
         const errors = [];

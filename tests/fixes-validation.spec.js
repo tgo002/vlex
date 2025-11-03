@@ -108,7 +108,7 @@ test.describe('Validação das Correções Implementadas', () => {
 
         // Verificar elementos do footer
         await expect(page.locator('.footer-brand')).toBeVisible();
-        await expect(page.locator('text=ValorExpert')).toBeVisible();
+        await expect(page.locator('text=ValorXpert')).toBeVisible();
         await expect(page.locator('.footer-links')).toBeVisible();
         await expect(page.locator('.footer-social')).toBeVisible();
         await expect(page.locator('.footer-bottom')).toBeVisible();

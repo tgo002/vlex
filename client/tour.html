@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -876,45 +876,49 @@
 
         // Carregar configurações do site
         async function loadSiteConfig() {
-            try {
-                const { data: config, error } = await supabase
-                    .from('site_settings')
-                    .select('*')
-                    .single();
+    try {
+        // Buscar todas as configurações e mapear para objeto chave/valor
+        const { data: settings, error } = await supabase
+            .from('site_settings')
+            .select('*');
 
-                if (error) {
-                    console.warn('Erro ao carregar configurações do site:', error);
-                    // Usar configurações padrão
-                    siteConfig = {
-                        company_name: 'ValorExpert',
-                        phone_number: '+55 (11) 9999-9999',
-                        whatsapp_number: '5511999999999',
-                        email: 'contato@tours360.com',
-                        address: 'São Paulo, SP - Brasil',
-                        broker_name: 'João Silva',
-                        creci_number: '123456',
-                        business_hours: 'Segunda a Sexta: 8h às 18h\nSábado: 8h às 14h'
-                    };
-                } else {
-                    siteConfig = config;
-                }
-
-                console.log('✅ Configurações do site carregadas:', siteConfig);
-            } catch (error) {
-                console.error('Erro ao carregar configurações:', error);
-                // Fallback para configurações padrão
-                siteConfig = {
-                    company_name: 'ValorExpert',
-                    phone_number: '+55 (11) 9999-9999',
-                    whatsapp_number: '5511999999999',
-                    email: 'contato@tours360.com',
-                    address: 'São Paulo, SP - Brasil',
-                    broker_name: 'João Silva',
-                    creci_number: '123456',
-                    business_hours: 'Segunda a Sexta: 8h às 18h\nSábado: 8h às 14h'
-                };
-            }
+        if (error) {
+            console.warn('Erro ao carregar configurações do site:', error);
         }
+
+        const cfg = {};
+        (settings || []).forEach(s => {
+            cfg[s.setting_key] = s.setting_value;
+        });
+
+        siteConfig = {
+            company_name: cfg.company_name || 'ValorXpert',
+            phone_number: cfg.phone_number || '+55 (19) 98284-1000',
+            whatsapp_number: cfg.whatsapp_number || '5519982841000',
+            email: cfg.email || 'contato@tours360.com',
+            address: cfg.address || 'São Paulo, SP - Brasil',
+            broker_name: cfg.broker_name || 'João Silva',
+            creci_number: cfg.creci_number || '123456',
+            business_hours: cfg.business_hours || 'Segunda a Sexta: 8h às 18h\nSábado: 8h às 14h'
+        };
+
+        console.log('✅ Configurações do site carregadas:', siteConfig);
+    } catch (error) {
+        console.error('Erro ao carregar configurações:', error);
+        // Fallback para configurações padrão
+        siteConfig = {
+            company_name: 'ValorXpert',
+            phone_number: '+55 (19) 98284-1000',
+            whatsapp_number: '5519982841000',
+            email: 'contato@tours360.com',
+            address: 'São Paulo, SP - Brasil',
+            broker_name: 'João Silva',
+            creci_number: '123456',
+            business_hours: 'Segunda a Sexta: 8h às 18h\nSábado: 8h às 14h'
+        };
+    }
+}
+
 
         // Modo demo/local para testes sem backend (ativa com ?demo=1 ou id=demo/test-property-id)
         async function initDemoTour() {
@@ -1484,6 +1488,28 @@
             `).join('');
         }
 
+        // Formatar número BR para exibição (+55 (19) 98284-1000)
+        function formatBrPhone(input) {
+            const digits = String(input || "").replace(/\D/g, "");
+            if (digits.startsWith("55") && digits.length >= 12) {
+                const area = digits.slice(2, 4);
+                const local = digits.slice(4);
+                if (local.length === 9) return `+55 (${area}) ${local.slice(0,5)}-${local.slice(5)}`;
+                if (local.length === 8) return `+55 (${area}) ${local.slice(0,4)}-${local.slice(4)}`;
+                return `+55 (${area}) ${local}`;
+            }
+            if (digits.length === 11) {
+                const area = digits.slice(0,2);
+                const local = digits.slice(2);
+                return `(${area}) ${local.slice(0,5)}-${local.slice(5)}`;
+            }
+            if (digits.length === 10) {
+                const area = digits.slice(0,2);
+                const local = digits.slice(2);
+                return `(${area}) ${local.slice(0,4)}-${local.slice(4)}`;
+            }
+            return input || "";
+        }
         // Atualizar informações de contato
         function updateContactInfo() {
             if (!siteConfig) return;
@@ -1506,7 +1532,7 @@
             // Atualizar telefone se existir elemento
             const phoneElement = document.getElementById('contactPhone');
             if (phoneElement) {
-                phoneElement.textContent = siteConfig.phone_number || '+55 (11) 9999-9999';
+                phoneElement.textContent = formatBrPhone((siteConfig.whatsapp_number || siteConfig.phone_number) || '5519982841000');
             }
 
             // Atualizar email se existir elemento
@@ -1607,7 +1633,7 @@
 
         // Compartilhar tour
         window.shareOnWhatsApp = function() {
-            const whatsappNumber = siteConfig?.whatsapp_number || '5511999999999';
+            const whatsappNumber = siteConfig?.whatsapp_number || '5519982841000';
             const url = encodeURIComponent(window.location.href);
             const text = encodeURIComponent(`Olá! Gostaria de mais informações sobre ${currentProperty.title}. Confira o tour virtual 360°: ${window.location.href}`);
             window.open(`https://wa.me/${whatsappNumber}?text=${text}`, '_blank');
@@ -1695,7 +1721,7 @@
                 return;
             }
 
-            const whatsappNumber = siteConfig.whatsapp_number || '5511999999999';
+            const whatsappNumber = siteConfig.whatsapp_number || '5519982841000';
             const propertyTitle = currentProperty.title || 'Propriedade';
             const tourUrl = window.location.href;
 
@@ -1741,3 +1767,7 @@
     </script>
 </body>
 </html>
+
+
+
+

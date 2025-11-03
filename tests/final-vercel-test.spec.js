@@ -146,7 +146,7 @@ test.describe('Teste final do Vercel - Correção de caminhos', () => {
         
         // Testar página inicial
         await page.goto(VERCEL_URL);
-        await expect(page).toHaveTitle(/ValorExpert/);
+        await expect(page).toHaveTitle(/ValorXpert/);
         console.log('✅ Página inicial OK');
         
         // Testar properties

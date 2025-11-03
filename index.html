@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ValorExpert - Avaliação Imobiliária Premium</title>
+    <title>ValorXpert - Avaliação Imobiliária Premium</title>
     <meta name="description" content="Explore imóveis exclusivos através de tours virtuais 360° de alta qualidade. Expertise e tecnologia de ponta para avaliação imobiliária precisa.">
     
     <!-- Fonts -->
@@ -344,7 +344,7 @@
 
         .properties-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 40px;
             margin-top: 60px;
         }
@@ -962,7 +962,7 @@
         <div class="nav-container">
             <a href="#" class="logo">
                 <i class="fas fa-chart-line"></i>
-                ValorExpert
+                ValorXpert
             </a>
             
             <nav class="nav-menu">
@@ -989,7 +989,7 @@
                     <i class="fas fa-play"></i>
                     Explorar Tours
                 </a>
-                <a href="#" class="btn-secondary" id="contactSpecialistBtn">
+                <a href="https://wa.me/5519982841000?text=Ol%C3%A1!%20Gostaria%20de%20falar%20com%20um%20especialista%20sobre%20os%20servi%C3%A7os%20da%20ValorXpert." class="btn-secondary" id="contactSpecialistBtn" target="_blank" rel="noopener noreferrer">
                     <i class="fas fa-phone"></i>
                     Falar com Especialista
                 </a>
@@ -1029,29 +1029,6 @@
                     <h2>Expertise e Tecnologia em Avaliação Imobiliária</h2>
                     <p>Revolucionamos a forma como você explora e avalia imóveis com nossa plataforma de tours virtuais 360° de alta qualidade. Cada detalhe é capturado com precisão cinematográfica e expertise profissional.</p>
 
-                    <div class="features-list">
-                        <div class="feature-item">
-                            <i class="fas fa-chart-line"></i>
-                            <div>
-                                <h4>Avaliação Especializada</h4>
-                                <p>Análise profissional de valor e potencial imobiliário</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-mobile-alt"></i>
-                            <div>
-                                <h4>Compatível com Todos os Dispositivos</h4>
-                                <p>Acesse de qualquer lugar, a qualquer momento</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-map-marked-alt"></i>
-                            <div>
-                                <h4>Pontos de Interesse Interativos</h4>
-                                <p>Explore cada ambiente com informações detalhadas</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="about-image">
@@ -1078,21 +1055,21 @@
                         <i class="fas fa-phone"></i>
                         <div>
                             <h4>Telefone</h4>
-                            <p>+55 (11) 9999-9999</p>
+                            <p id="contactPhone">+55 (11) 9999-9999</p>
                         </div>
                     </div>
                     <div class="contact-item">
                         <i class="fas fa-envelope"></i>
                         <div>
                             <h4>Email</h4>
-                            <p>contato@tours360.com</p>
+                            <p id="contactEmail">contato@tours360.com</p>
                         </div>
                     </div>
                     <div class="contact-item">
                         <i class="fas fa-map-marker-alt"></i>
                         <div>
                             <h4>Endereço</h4>
-                            <p>São Paulo, SP - Brasil</p>
+                            <p id="contactAddress">São Paulo, SP - Brasil</p>
                         </div>
                     </div>
                 </div>
@@ -1105,7 +1082,7 @@
                     </div>
 
                     <div class="whatsapp-options">
-                        <a href="#" class="whatsapp-btn primary" id="whatsappGeneral">
+                        <a href="https://wa.me/5519982841000?text=Ol%C3%A1!%20Gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20os%20servi%C3%A7os%20da%20ValorXpert." class="whatsapp-btn primary" id="whatsappGeneral" target="_blank" rel="noopener noreferrer">
                             <div class="whatsapp-icon">
                                 <i class="fab fa-whatsapp"></i>
                             </div>
@@ -1116,7 +1093,7 @@
                             <i class="fas fa-arrow-right"></i>
                         </a>
 
-                        <a href="#" class="whatsapp-btn secondary" id="whatsappProperties">
+                        <a href="https://wa.me/5519982841000?text=Ol%C3%A1!%20Estou%20interessado(a)%20em%20conhecer%20os%20im%C3%B3veis%20dispon%C3%ADveis.%20Podem%20me%20ajudar%3F" class="whatsapp-btn secondary" id="whatsappProperties" target="_blank" rel="noopener noreferrer">
                             <div class="whatsapp-icon">
                                 <i class="fas fa-home"></i>
                             </div>
@@ -1127,7 +1104,7 @@
                             <i class="fas fa-arrow-right"></i>
                         </a>
 
-                        <a href="#" class="whatsapp-btn secondary" id="whatsappTours">
+                        <a href="https://wa.me/5519982841000?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20um%20tour%20virtual%20personalizado.%20Como%20funciona%3F" class="whatsapp-btn secondary" id="whatsappTours" target="_blank" rel="noopener noreferrer">
                             <div class="whatsapp-icon">
                                 <i class="fas fa-camera"></i>
                             </div>
@@ -1154,9 +1131,9 @@
                 <div class="footer-brand">
                     <a href="#" class="logo">
                         <i class="fas fa-chart-line"></i>
-                        ValorExpert
+                        ValorXpert
                     </a>
-                    <p>Avaliação imobiliária premium com expertise e tecnologia</p>
+                    <p>Imóveis com desconto e tour virtual 360º</p>
                 </div>
 
                 <div class="footer-links">
@@ -1171,8 +1148,8 @@
                 <div class="footer-social">
                     <h4>Redes Sociais</h4>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=61579022192415"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.instagram.com/valorxpertimoveis/"><i class="fab fa-instagram"></i></a>
                         <a href="#"><i class="fab fa-linkedin"></i></a>
                         <a href="#"><i class="fab fa-youtube"></i></a>
                     </div>
@@ -1180,7 +1157,7 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2024 ValorExpert. Todos os direitos reservados.</p>
+                <p>&copy; 2024 ValorXpert. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
@@ -1188,11 +1165,9 @@
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script>
+    <script type="module">
+        import { supabase } from '/shared/supabase-client.js';
         // Configuração do Supabase
-        const SUPABASE_URL = 'https://ewivsujoqdnltdktkyvh.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3aXZzdWpvcWRubHRka3RreXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNjIwMzAsImV4cCI6MjA3MjkzODAzMH0.qcSgD6XCJvVj1UsltzvqXeHEBU0fMHB9e25CID4M9Yo';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Configurar redes sociais
         function configureSocialMedia(config) {
@@ -1200,10 +1175,10 @@
 
             // URLs das redes sociais (usar configuração ou padrão)
             const socialUrls = {
-                facebook: config.facebook_url || '#',
-                instagram: config.instagram_url || '#',
-                linkedin: config.linkedin_url || '#',
-                youtube: config.youtube_url || '#'
+                facebook: config.facebook_url || document.querySelector('.social-links a .fa-facebook')?.closest('a')?.getAttribute('href') || '#',
+                instagram: config.instagram_url || document.querySelector('.social-links a .fa-instagram')?.closest('a')?.getAttribute('href') || '#',
+                linkedin: config.linkedin_url || document.querySelector('.social-links a .fa-linkedin')?.closest('a')?.getAttribute('href') || '#',
+                youtube: config.youtube_url || document.querySelector('.social-links a .fa-youtube')?.closest('a')?.getAttribute('href') || '#'
             };
 
             socialLinks.forEach(link => {
@@ -1211,21 +1186,37 @@
                 if (icon) {
                     if (icon.classList.contains('fa-facebook')) {
                         link.href = socialUrls.facebook;
+                        if (link.href && link.href !== '#' && link.href.startsWith('http')) {
+                            link.target = '_blank';
+                            link.rel = 'noopener noreferrer';
+                        }
                         if (socialUrls.facebook === '#') {
                             link.style.display = 'none';
                         }
                     } else if (icon.classList.contains('fa-instagram')) {
                         link.href = socialUrls.instagram;
+                        if (link.href && link.href !== '#' && link.href.startsWith('http')) {
+                            link.target = '_blank';
+                            link.rel = 'noopener noreferrer';
+                        }
                         if (socialUrls.instagram === '#') {
                             link.style.display = 'none';
                         }
                     } else if (icon.classList.contains('fa-linkedin')) {
                         link.href = socialUrls.linkedin;
+                        if (link.href && link.href !== '#' && link.href.startsWith('http')) {
+                            link.target = '_blank';
+                            link.rel = 'noopener noreferrer';
+                        }
                         if (socialUrls.linkedin === '#') {
                             link.style.display = 'none';
                         }
                     } else if (icon.classList.contains('fa-youtube')) {
                         link.href = socialUrls.youtube;
+                        if (link.href && link.href !== '#' && link.href.startsWith('http')) {
+                            link.target = '_blank';
+                            link.rel = 'noopener noreferrer';
+                        }
                         if (socialUrls.youtube === '#') {
                             link.style.display = 'none';
                         }
@@ -1248,9 +1239,16 @@
 
                 // Converter array para objeto
                 const config = {};
-                settings.forEach(setting => {
+                (settings || []).forEach(setting => {
                     config[setting.setting_key] = setting.setting_value;
                 });
+                // Aplicar contato do rodapé a partir das configurações
+                const phoneEl = document.getElementById("contactPhone");
+                const emailEl = document.getElementById("contactEmail");
+                const addressEl = document.getElementById("contactAddress");
+                if (phoneEl && config.phone_number) phoneEl.textContent = config.phone_number;
+                if (emailEl && config.email) emailEl.textContent = config.email;
+                if (addressEl && config.address) addressEl.textContent = config.address;
 
                 // Aplicar configurações na página
                 if (config.hero_title) {
@@ -1367,8 +1365,10 @@
                 const { data: properties, error: propertiesError } = await supabase
                     .from('properties')
                     .select('*')
-                    .eq('is_published', true)
-                    .order('created_at', { ascending: false });
+                    .eq('status', 'published')
+                    .order('created_at', { ascending: false })
+                    .limit(2);
+
 
                 if (propertiesError) {
                     console.warn('Supabase indisponível, usando dados de exemplo:', propertiesError);
@@ -1528,21 +1528,21 @@
 
                 if (error) {
                     console.warn('Erro ao carregar configurações WhatsApp:', error);
-                    return;
+
                 }
 
                 // Converter array para objeto
                 const config = {};
-                settings.forEach(setting => {
+                (settings || []).forEach(setting => {
                     config[setting.setting_key] = setting.setting_value;
                 });
 
-                const whatsappNumber = config.whatsapp_number || '5511999999999';
+                const whatsappNumber = config.whatsapp_number || '5519982841000';
 
                 // Configurar botões WhatsApp
                 const whatsappButtons = {
                     whatsappGeneral: {
-                        message: 'Olá! Gostaria de mais informações sobre os serviços da ValorExpert.'
+                        message: 'Olá! Gostaria de mais informações sobre os serviços da ValorXpert.'
                     },
                     whatsappProperties: {
                         message: 'Olá! Estou interessado(a) em conhecer os imóveis disponíveis. Podem me ajudar?'
@@ -1568,7 +1568,7 @@
                 // Configurar botão "Falar com Especialista"
                 const contactSpecialistBtn = document.getElementById('contactSpecialistBtn');
                 if (contactSpecialistBtn) {
-                    const specialistMessage = encodeURIComponent('Olá! Gostaria de falar com um especialista sobre os serviços da ValorExpert.');
+                    const specialistMessage = encodeURIComponent('Olá! Gostaria de falar com um especialista sobre os serviços da ValorXpert.');
                     const specialistUrl = `https://wa.me/${whatsappNumber}?text=${specialistMessage}`;
 
                     contactSpecialistBtn.href = specialistUrl;
@@ -1590,3 +1590,9 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+

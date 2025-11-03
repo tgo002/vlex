@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('ValorExpert - Correções de Navegação e Imagens', () => {
+test.describe('ValorXpert - Correções de Navegação e Imagens', () => {
     
     test('Deve ter navegação única na página de detalhes (sem duplicação)', async ({ page }) => {
         await page.goto('http://localhost:8000/property-details.html?id=a1b2c3d4-e5f6-7890-abcd-ef1234567890');
