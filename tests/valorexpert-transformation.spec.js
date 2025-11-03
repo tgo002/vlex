@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+﻿import { test, expect } from '@playwright/test';
 
 test.describe('ValorXpert - Transformação Completa', () => {
     test.beforeEach(async ({ page }) => {
@@ -26,7 +26,7 @@ test.describe('ValorXpert - Transformação Completa', () => {
         
         // Verificar hero section
         const heroTitle = page.locator('.hero-content h1');
-        await expect(heroTitle).toContainText('Avaliação Imobiliária Premium');
+        await expect(heroTitle).toContainText('Imóveis com desconto e tour virtual 360º');
         
         // Verificar footer
         const footerLogo = page.locator('footer .logo');
@@ -219,3 +219,4 @@ test.describe('ValorXpert - Transformação Completa', () => {
         expect(criticalErrors).toHaveLength(0);
     });
 });
+
